@@ -12,3 +12,5 @@ fi
 cp -f \
   ${PWD}/.devcontainer/scripts/devcontainers.zsh-theme \
   /home/vscode/.oh-my-zsh/custom/themes/devcontainers.zsh-theme
+
+corepack enable && corepack install
