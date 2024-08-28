@@ -1,0 +1,117 @@
+import { BasePage } from "#/common/page/BasePage";
+import {
+  Bullseye,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Flex,
+  FlexItem,
+  Icon,
+  Stack,
+  StackItem,
+  Text,
+  TextContent,
+} from "@patternfly/react-core";
+import {
+  EnterpriseIcon,
+  ClusterIcon,
+  MigrationIcon,
+} from "@patternfly/react-icons";
+import React from "react";
+import { Link } from "react-router-dom";
+import globalActiveColor300 from "@patternfly/react-tokens/dist/esm/global_active_color_300";
+
+const cards: React.ReactElement[] = [
+  <Card isFullHeight isPlain key="card-1">
+    <CardHeader>
+      <TextContent style={{ textAlign: "center" }}>
+        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
+          <EnterpriseIcon />
+        </Icon>
+        <Text component="h2">Discover your VMware environment</Text>
+      </TextContent>
+    </CardHeader>
+    <CardBody>
+      <TextContent>
+        <Text>
+          Run the discovery process and create a full evaluation report
+          including recommendations for your migration journey.
+          <Button size="sm" variant="link">
+            See an example report.
+          </Button>
+        </Text>
+      </TextContent>
+    </CardBody>
+  </Card>,
+
+  <Card isFullHeight isPlain key="card-2">
+    <CardHeader>
+      <TextContent style={{ textAlign: "center" }}>
+        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
+          <ClusterIcon />
+        </Icon>
+        <Text component="h2">Select a target cluster</Text>
+      </TextContent>
+    </CardHeader>
+    <CardBody>
+      <TextContent>
+        <Text>
+          Select your target OpenShift Cluster to fit your migration goals.
+        </Text>
+      </TextContent>
+    </CardBody>
+  </Card>,
+
+  <Card isFullHeight isPlain key="card-3">
+    <CardHeader>
+      <TextContent style={{ textAlign: "center" }}>
+        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
+          <MigrationIcon />
+        </Icon>
+        <Text component="h2">Create a migration plan</Text>
+      </TextContent>
+    </CardHeader>
+    <CardBody>
+      <TextContent>
+        <Text>
+          Select your VMs, create a network and storage mapping and schedule
+          your migration timeline
+        </Text>
+      </TextContent>
+    </CardBody>
+  </Card>,
+];
+
+export const MigrationAssessmentPage: React.FC = () => (
+  <BasePage
+    breadcrumbs={[
+      {
+        key: 1,
+        to: "#",
+        children: "Migration assessment",
+        isActive: true,
+      },
+    ]}
+    title="Welcome, let's start your migration journey from VMware to OpenShift."
+  >
+    <Bullseye>
+      <Stack hasGutter style={{ justifyContent: "space-evenly" }}>
+        <StackItem>
+          <Flex>
+            {cards.map((card) => (
+              <FlexItem flex={{ default: "flex_1" }}>{card}</FlexItem>
+            ))}
+          </Flex>
+        </StackItem>
+        <StackItem style={{ alignSelf: "center" }}>
+          <Link to="/migrate/wizard">
+            <Button>Start your migration journey</Button>
+          </Link>
+        </StackItem>
+      </Stack>
+    </Bullseye>
+  </BasePage>
+);
+
+MigrationAssessmentPage.displayName = "MigrationAssessmentPage";
