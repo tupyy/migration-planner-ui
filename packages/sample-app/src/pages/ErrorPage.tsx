@@ -13,8 +13,10 @@ import {
   Text,
   ButtonProps,
 } from "@patternfly/react-core";
-import { WarningTriangleIcon } from "@patternfly/react-icons";
+import { WarningTriangleIcon, ErrorCircleOIcon } from "@patternfly/react-icons";
 import globalWarningColor100 from "@patternfly/react-tokens/dist/esm/global_warning_color_100";
+import globalDangerColor100 from "@patternfly/react-tokens/dist/esm/global_danger_color_100";
+import { useLocation, useParams } from "react-router-dom";
 
 const bounce = keyframes`
   from, 20%, 53%, 80%, to {
@@ -43,15 +45,23 @@ const classes = {
 } as const;
 
 type Props = {
-  code: number | string;
-  message: string;
+  code?: string;
+  message?: string;
   additionalDetails?: string;
   /** A list of actions, the first entry is considered primary and the rest are secondary. */
-  actions: Array<Omit<ButtonProps, "variant">>;
+  actions?: Array<Omit<ButtonProps, "variant">>;
 };
 
 export const ErrorPage: React.FC<Props> = (props) => {
-  const { code, message, additionalDetails, actions } = props;
+  const params = useParams();
+  const location = useLocation();
+
+  const {
+    code = params.code ?? "500",
+    message = location.state?.message ?? "It's not you it's us...",
+    additionalDetails,
+    actions = [],
+  } = props;
   const [primaryAction, ...otherActions] = actions;
 
   return (
@@ -63,8 +73,14 @@ export const ErrorPage: React.FC<Props> = (props) => {
           icon={
             <EmptyStateIcon
               className={classes.icon}
-              icon={WarningTriangleIcon}
-              color={globalWarningColor100.value}
+              icon={
+                parseInt(code) < 500 ? WarningTriangleIcon : ErrorCircleOIcon
+              }
+              color={
+                parseInt(code) < 500
+                  ? globalWarningColor100.value
+                  : globalDangerColor100.value
+              }
             />
           }
         />
@@ -74,16 +90,18 @@ export const ErrorPage: React.FC<Props> = (props) => {
             {additionalDetails ?? <Text>{additionalDetails}</Text>}
           </TextContent>
         </EmptyStateBody>
-        <EmptyStateFooter>
-          <EmptyStateActions>
-            <Button variant="primary" {...primaryAction} />
-          </EmptyStateActions>
-          <EmptyStateActions>
-            {otherActions.map(({ key, ...props }) => (
-              <Button key={key} variant="secondary" {...props} />
-            ))}
-          </EmptyStateActions>
-        </EmptyStateFooter>
+        {actions.length > 0 && (
+          <EmptyStateFooter>
+            <EmptyStateActions>
+              <Button variant="primary" {...primaryAction} />
+            </EmptyStateActions>
+            <EmptyStateActions>
+              {otherActions.map(({ key, ...props }) => (
+                <Button key={key} variant="secondary" {...props} />
+              ))}
+            </EmptyStateActions>
+          </EmptyStateFooter>
+        )}
       </EmptyState>
     </Bullseye>
   );

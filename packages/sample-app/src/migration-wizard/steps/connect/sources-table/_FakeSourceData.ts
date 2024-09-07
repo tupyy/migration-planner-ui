@@ -3,15 +3,20 @@ export interface Source {
   uuid: string | number | bigint;
   name: string;
   status?: string;
-  vmUrl?: string;
+  hosts?: string[]
+  vms?: string[];
+  networks?: string[];
+  datastores?: string[]; 
 }
 
-// In real usage, this data would come from some external source like an API via props.
 export const fakeSources: Source[] = [
   {
     uuid: 1,
     name: "project-banco-ciudad-vcenter-1",
     status: "Waiting for credentials",
-    vmUrl: "https://104.121.23.193:443",
+    hosts: new Array<string>(10),
+    vms: new Array<string>(3000),
+    networks: new Array<string>(7),
+    datastores: new Array<string>(600),
   },
 ];

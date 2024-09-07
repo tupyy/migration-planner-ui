@@ -1,4 +1,5 @@
-import { BasePage } from "#/common/page/BasePage";
+import React from "react";
+import { Link } from "react-router-dom";
 import {
   Bullseye,
   Button,
@@ -13,27 +14,23 @@ import {
   Text,
   TextContent,
 } from "@patternfly/react-core";
-import {
-  EnterpriseIcon,
-  ClusterIcon,
-  MigrationIcon,
-} from "@patternfly/react-icons";
-import React from "react";
-import { Link } from "react-router-dom";
+import { ClusterIcon, MigrationIcon } from "@patternfly/react-icons";
 import globalActiveColor300 from "@patternfly/react-tokens/dist/esm/global_active_color_300";
+import { BasePage } from "#/kitchensink/BasePage";
+import { CustomEnterpriseIcon } from "#/kitchensink/CustomEnterpriseIcon";
 
 const cards: React.ReactElement[] = [
   <Card isFullHeight isPlain key="card-1">
     <CardHeader>
       <TextContent style={{ textAlign: "center" }}>
-        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
-          <EnterpriseIcon />
+        <Icon size="xl" style={{ color: globalActiveColor300.var }}>
+          <CustomEnterpriseIcon />
         </Icon>
         <Text component="h2">Discover your VMware environment</Text>
       </TextContent>
     </CardHeader>
     <CardBody>
-      <TextContent>
+      <TextContent style={{ textAlign: "center" }}>
         <Text>
           Run the discovery process and create a full evaluation report
           including recommendations for your migration journey.
@@ -48,14 +45,14 @@ const cards: React.ReactElement[] = [
   <Card isFullHeight isPlain key="card-2">
     <CardHeader>
       <TextContent style={{ textAlign: "center" }}>
-        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
+        <Icon size="xl" style={{ color: globalActiveColor300.var }}>
           <ClusterIcon />
         </Icon>
         <Text component="h2">Select a target cluster</Text>
       </TextContent>
     </CardHeader>
     <CardBody>
-      <TextContent>
+      <TextContent style={{ textAlign: "center" }}>
         <Text>
           Select your target OpenShift Cluster to fit your migration goals.
         </Text>
@@ -66,14 +63,14 @@ const cards: React.ReactElement[] = [
   <Card isFullHeight isPlain key="card-3">
     <CardHeader>
       <TextContent style={{ textAlign: "center" }}>
-        <Icon size="xl" style={{ color: globalActiveColor300.value }}>
+        <Icon size="xl" style={{ color: globalActiveColor300.var }}>
           <MigrationIcon />
         </Icon>
         <Text component="h2">Create a migration plan</Text>
       </TextContent>
     </CardHeader>
     <CardBody>
-      <TextContent>
+      <TextContent style={{ textAlign: "center" }}>
         <Text>
           Select your VMs, create a network and storage mapping and schedule
           your migration timeline
@@ -100,7 +97,9 @@ export const MigrationAssessmentPage: React.FC = () => (
         <StackItem>
           <Flex>
             {cards.map((card) => (
-              <FlexItem flex={{ default: "flex_1" }}>{card}</FlexItem>
+              <FlexItem flex={{ default: "flex_1" }} key={card.key}>
+                {card}
+              </FlexItem>
             ))}
           </Flex>
         </StackItem>

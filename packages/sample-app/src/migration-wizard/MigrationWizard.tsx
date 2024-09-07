@@ -1,9 +1,8 @@
 import React from "react";
 import { Wizard, WizardStep } from "@patternfly/react-core";
-import { ConnectStepContent } from "./steps/connect-step/ConnectStepContent";
-import { DiscoveryStepContent } from "./steps/DiscoveryStepContent";
+import { ConnectStepContent } from "./steps/connect/ConnectStepContent";
+import { DiscoveryStepContent } from "./steps/discovery/DiscoveryStepContent";
 import { useComputedHeightFromPageHeader } from "./hooks/useComputedHeightFromPageHeader";
-// import { ReviewStepContent } from "./steps/ReviewStepContent";
 
 export const MigrationWizard: React.FC = () => {
   const height = useComputedHeightFromPageHeader();
@@ -11,7 +10,7 @@ export const MigrationWizard: React.FC = () => {
   return (
     <Wizard height={height} title="Migration wizard">
       <WizardStep
-        name="Connect your vCenter"
+        name="Connect"
         id="connect-step"
         footer={{ isCancelHidden: true, isNextDisabled: true }}
       >
@@ -20,13 +19,8 @@ export const MigrationWizard: React.FC = () => {
       <WizardStep name="Discovery" id="discovery-step">
         <DiscoveryStepContent />
       </WizardStep>
-      {/* <WizardStep
-        name="Review"
-        id="review-step"
-        footer={{ nextButtonText: "Finish" }}
-      >
-        <ReviewStepContent />
-      </WizardStep> */}
     </Wizard>
   );
 };
+
+MigrationWizard.displayName = "MigrationWizard";

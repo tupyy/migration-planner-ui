@@ -1,9 +1,9 @@
 import React from "react";
 import { Bullseye } from "@patternfly/react-core";
-import { BasePage } from "#/common/page/BasePage";
-import { VMwareMigrationCard } from "#/common/ocm-card/VMwareMigrationCard";
+import { BasePage } from "#/kitchensink/BasePage";
+import { VMwareMigrationCard } from "#/ocm/components/VMwareMigrationCard";
 
-export const OcmDemoPage: React.FC = () => {
+export const OcmPreviewPage: React.FC = () => {
   return (
     <BasePage title="VMware Migration Assessment Card for OCM">
       <Bullseye>
@@ -13,4 +13,4 @@ export const OcmDemoPage: React.FC = () => {
   );
 };
 
-OcmDemoPage.displayName = "OcmDemoPage";
+OcmPreviewPage.displayName = "OcmPreviewPage";

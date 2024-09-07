@@ -3,7 +3,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { MigrationAssessmentPage } from "#/pages/MigrationAssessmentPage";
 import { MigrationWizardPage } from "#/pages/MigrationWizardPage";
 import { ErrorPage } from "#/pages/ErrorPage";
-import { OcmDemoPage } from "#/pages/OcmDemoPage";
+import { OcmPreviewPage } from "#/pages/OcmPreviewPage";
+import { VmPreviewPage } from "#/pages/VmPreviewPage";
 
 export const AppRouter: React.FC = () => {
   return (
@@ -11,8 +12,16 @@ export const AppRouter: React.FC = () => {
       <Route path="/" element={<Navigate to="/migrate" />} />
       <Route path="/migrate" element={<MigrationAssessmentPage />} />
       <Route path="/migrate/wizard" element={<MigrationWizardPage />} />
-      <Route path="/preview" element={<Navigate to="/preview/ocm-card" />} />
-      <Route path="/preview/ocm-card" element={<OcmDemoPage />} />
+
+      {/* These are not exposed in the App */}
+      <Route path="/preview" element={<Navigate to="/preview/ocm" />} />
+      <Route path="/preview/ocm" element={<OcmPreviewPage />} />
+      <Route path="/preview/vm" element={<VmPreviewPage />} />
+
+      <Route
+        path="/error/:code"
+        element={<ErrorPage />}
+      />
       <Route
         path="*"
         element={

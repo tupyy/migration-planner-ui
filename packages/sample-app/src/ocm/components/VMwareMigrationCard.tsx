@@ -16,7 +16,7 @@ import {
 } from "@patternfly/react-core";
 import { css } from "@emotion/css";
 import { Link } from "react-router-dom";
-import logo from "./assets/openshift-logo.svg";
+import { OpenShiftIcon } from "./OpenShiftIcon";
 
 const classes = {
   cardRoot: css({ width: "22em", height: "22em" }),
@@ -28,7 +28,7 @@ export const VMwareMigrationCard: React.FC = () => {
       <CardHeader>
         <Split hasGutter>
           <SplitItem>
-            <img src={logo} />
+            <OpenShiftIcon />
           </SplitItem>
           <SplitItem isFilled />
           <SplitItem>
@@ -51,7 +51,7 @@ export const VMwareMigrationCard: React.FC = () => {
       <CardFooter>
         <Flex>
           <FlexItem>
-            <Link to="/migrate">
+            <Link to="/migrate/wizard">
               <Button variant="secondary">Start your migration journey</Button>
             </Link>
           </FlexItem>
