@@ -3,7 +3,7 @@ import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { SourcesTableColumns } from "./SourcesTableColumns";
 import { Source } from "./_FakeSourceData";
 import { SourcesTableEmptyState } from "./SourcesTableEmptyState";
-import { noop } from "#/kitchensink/utils";
+import { noop } from "#/common/utils";
 
 const VALUE_NOT_AVAILABLE = "-";
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { BasePage } from "#/kitchensink/BasePage";
+import { BasePage } from "#/common/components/BasePage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
 
 export const MigrationWizardPage: React.FC = () => {

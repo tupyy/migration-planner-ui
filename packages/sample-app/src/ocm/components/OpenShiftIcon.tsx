@@ -1,5 +1,5 @@
 import React from "react";
-import { SVGIcon } from "../../kitchensink/SVGIcon";
+import { SVGIcon } from "../../common/components/SVGIcon";
 import { css } from "@emotion/css";
 
 const classes = {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Bullseye } from "@patternfly/react-core";
-import { BasePage } from "#/kitchensink/BasePage";
+import { BasePage } from "#/common/components/BasePage";
 import { VMwareMigrationCard } from "#/ocm/components/VMwareMigrationCard";
 
 export const OcmPreviewPage: React.FC = () => {

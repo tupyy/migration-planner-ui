@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { mix } from './hacks/vite-plugin-mix'
+import { mix } from "./hacks/vite-plugin-mix";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,7 +9,7 @@ export default defineConfig({
     tsconfigPaths(),
     react(),
     mix({
-      handler: "./src/tests/_mock-api.ts",
+      handler: "./src/tests/_MockServer.ts",
     }),
   ],
 });

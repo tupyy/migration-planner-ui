@@ -18,17 +18,23 @@ export const AppRouter: React.FC = () => {
       <Route path="/preview/ocm" element={<OcmPreviewPage />} />
       <Route path="/preview/vm" element={<VmPreviewPage />} />
 
-      <Route
-        path="/error/:code"
-        element={<ErrorPage />}
-      />
+      <Route path="/error/:code" element={<ErrorPage />} />
+
       <Route
         path="*"
         element={
           <ErrorPage
             code="404"
             message="We lost that page"
-            actions={[{ children: "Go back", component: "a", href: "/" }]}
+            actions={[
+              {
+                children: "Go back",
+                component: "a",
+                onClick: (_event): void => {
+                  history.back();
+                },
+              },
+            ]}
           />
         }
       />
