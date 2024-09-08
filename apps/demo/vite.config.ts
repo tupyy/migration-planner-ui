@@ -9,7 +9,7 @@ export default defineConfig({
     tsconfigPaths(),
     react(),
     mix({
-      handler: "./src/tests/_MockServer.ts",
+      handler: "./hacks/mock-server.ts",
     }),
   ],
 });
