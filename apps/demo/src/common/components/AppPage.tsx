@@ -21,7 +21,7 @@ type Props = {
   breadcrumbs?: Array<BreadcrumbItemProps>;
 };
 
-export const BasePage: React.FC<React.PropsWithChildren<Props>> = (props) => {
+export const AppPage: React.FC<React.PropsWithChildren<Props>> = (props) => {
   const { title, caption, breadcrumbs, children } = props;
 
   return (
@@ -51,4 +51,4 @@ export const BasePage: React.FC<React.PropsWithChildren<Props>> = (props) => {
   );
 };
 
-BasePage.displayName = "BasePage";
+AppPage.displayName = "BasePage";

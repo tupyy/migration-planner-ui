@@ -16,7 +16,7 @@ import {
 } from "@patternfly/react-core";
 import { ClusterIcon, MigrationIcon } from "@patternfly/react-icons";
 import globalActiveColor300 from "@patternfly/react-tokens/dist/esm/global_active_color_300";
-import { BasePage } from "#/common/components/BasePage";
+import { AppPage } from "#/common/components/AppPage";
 import { CustomEnterpriseIcon } from "#/common/components/CustomEnterpriseIcon";
 
 const cards: React.ReactElement[] = [
@@ -81,7 +81,7 @@ const cards: React.ReactElement[] = [
 ];
 
 export const MigrationAssessmentPage: React.FC = () => (
-  <BasePage
+  <AppPage
     breadcrumbs={[
       {
         key: 1,
@@ -110,7 +110,7 @@ export const MigrationAssessmentPage: React.FC = () => (
         </StackItem>
       </Stack>
     </Bullseye>
-  </BasePage>
+  </AppPage>
 );
 
 MigrationAssessmentPage.displayName = "MigrationAssessmentPage";

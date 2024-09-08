@@ -2,8 +2,10 @@ import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useMount, useTitle } from "react-use";
 import { useNavigate } from "react-router-dom";
 import { AlertVariant } from "@patternfly/react-core";
-import { PlannerAgentApiClient } from "#/clients/planner-agent/PlannerAgentApiClient";
-import { Credentials } from "#/clients/planner-agent/models";
+import {
+  CredentialsApiClient,
+  type Credentials,
+} from "#/clients/CredentialsApi";
 import {
   DATA_SHARING_ALLOWED_DEFAULT_STATE,
   docTitle,
@@ -50,7 +52,7 @@ export function useLoginFormViewModel(): LoginFormViewModel {
       password: form["password"].value,
       isDataSharingAllowed: form["isDataSharingAllowed"].checked,
     };
-    const [statusCodeOK, error] = await PlannerAgentApiClient.putCredentials(
+    const [statusCodeOK, error] = await CredentialsApiClient.putCredentials(
       credentials,
       500
     );

@@ -1,10 +1,10 @@
 import React from "react";
-import { BasePage } from "#/common/components/BasePage";
+import { AppPage } from "#/common/components/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
 
 export const MigrationWizardPage: React.FC = () => {
   return (
-    <BasePage
+    <AppPage
       breadcrumbs={[
         { key: 1, to: "/migrate", children: "Migration assessment" },
         { key: 2, to: "#", children: "Guide", isActive: true },
@@ -12,7 +12,7 @@ export const MigrationWizardPage: React.FC = () => {
       title="Welcome, let's start your migration journey from VMware to OpenShift."
     >
       <MigrationWizard />
-    </BasePage>
+    </AppPage>
   );
 };
 
