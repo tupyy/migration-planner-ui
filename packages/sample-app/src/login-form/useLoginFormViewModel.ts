@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import { AlertVariant } from "@patternfly/react-core";
 import { PlannerAgentApiClient } from "#/clients/planner-agent/PlannerAgentApiClient";
 import { Credentials } from "#/clients/planner-agent/models";
-import { useLazyRef } from "#/common/hooks/useLazyRef";
 import {
   DATA_SHARING_ALLOWED_DEFAULT_STATE,
   docTitle,
@@ -34,11 +33,11 @@ const _computeFormControlVariant = (
 
 export function useLoginFormViewModel(): LoginFormViewModel {
   const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
-  const [formRef, formCallbackRef] = useLazyRef<HTMLFormElement>();
+  const formRef = useRef<HTMLFormElement>();
   const eventTargetRef = useRef<EventTarget>(new EventTarget());
   const navigateTo = useNavigate();
 
-  const _handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(async () => {
     const form = formRef.current;
     if (!form) {
       console.log("The form is not mounted yet");
@@ -89,15 +88,16 @@ export function useLoginFormViewModel(): LoginFormViewModel {
 
   useEffect(() => {
     const eventTarget = eventTargetRef.current;
-    eventTarget.addEventListener("submit", _handleSubmit);
+    eventTarget.addEventListener("submit", handleSubmit);
     return (): void => {
-      eventTarget.removeEventListener("submit", _handleSubmit);
+      eventTarget.removeEventListener("submit", handleSubmit);
     };
-  }, [_handleSubmit]);
+  }, [handleSubmit]);
   useTitle(docTitle);
 
   return {
     formState,
+    formRef,
     cardTitle,
     cardDescription,
     urlControlStateVariant: useMemo<FormControlValidatedStateVariant>(() => {
@@ -184,6 +184,5 @@ export function useLoginFormViewModel(): LoginFormViewModel {
       },
       [formRef]
     ),
-    formCallbackRef,
   };
 }

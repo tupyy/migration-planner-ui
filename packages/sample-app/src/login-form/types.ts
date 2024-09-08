@@ -16,6 +16,7 @@ import type { AlertVariant } from "@patternfly/react-core";
 
 export interface LoginFormViewModel {
   formState: FormStates;
+  formRef: React.MutableRefObject<HTMLFormElement | undefined>;
   cardTitle: string;
   cardDescription: string;
   urlControlStateVariant: FormControlValidatedStateVariant;
@@ -31,6 +32,5 @@ export interface LoginFormViewModel {
   alertDescriptionList?: Array<{ id: number; text: string }>;
   alertActionLinkText?: string;
   shouldDisplayAlert: boolean;
-  formCallbackRef: (node: HTMLFormElement) => void;
   checkFormValidity: React.FormEventHandler<HTMLFormElement>;
 }
