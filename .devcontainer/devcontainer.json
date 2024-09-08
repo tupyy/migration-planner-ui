@@ -9,7 +9,7 @@
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/devcontainers-contrib/features/act:1": {},
 		"ghcr.io/devcontainers-contrib/features/fzf:1": {},
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {}
+		"ghcr.io/devcontainers/features/java:1": {}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
@@ -22,6 +22,7 @@
 	"customizations": {
 		"vscode": {
 			"extensions": [
+				"-vscjava.vscode-java-pack",
 				"dbaeumer.vscode-eslint",
 				"eamodio.gitlens",
 				"esbenp.prettier-vscode",

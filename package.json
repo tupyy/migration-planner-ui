@@ -3,5 +3,8 @@
   "packageManager": "yarn@4.4.1",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.5"
+  }
 }
