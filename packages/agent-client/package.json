@@ -1,0 +1,26 @@
+{
+  "name": "@migration-planner-ui/agent-client",
+  "version": "1.0.0-alpha",
+  "description": "OpenAPI client for Migration Planner Agent",
+  "author": "OpenAPI-Generator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jkilzi/migration-planner-ui.git",
+    "directory": "packages/agent-client"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "typings": "./dist/index.d.ts",
+      "development": "./src/index.ts"
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -b",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^4.0 || ^5.0"
+  }
+}
