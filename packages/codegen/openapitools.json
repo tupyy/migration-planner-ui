@@ -1,0 +1,33 @@
+{
+  "$schema": "../../node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+  "spaces": 2,
+  "generator-cli": {
+    "version": "7.8.0",
+    "generators": {
+      "agent-client": {
+        "inputSpec": "https://raw.githubusercontent.com/kubev2v/migration-planner/main/api/v1alpha1/agent/openapi.yaml",
+        "output": "../agent-client",
+        "generatorName": "typescript-fetch",
+        "additionalProperties": {
+          "npmName": "@migration-planner-ui/agent-client",
+          "npmVersion": "1.0.0-alpha",
+          "ensureUniqueParams": true,
+          "supportsES6": true,
+          "withInterfaces": true
+        }
+      },
+      "api-client": {
+        "inputSpec": "https://raw.githubusercontent.com/kubev2v/migration-planner/main/api/v1alpha1/openapi.yaml",
+        "output": "../api-client",
+        "generatorName": "typescript-fetch",
+        "additionalProperties": {
+          "npmName": "@migration-planner-ui/api-client",
+          "npmVersion": "1.0.0-alpha",
+          "ensureUniqueParams": true,
+          "supportsES6": true,
+          "withInterfaces": true
+        }
+      }
+    }
+  }
+}

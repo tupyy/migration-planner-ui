@@ -1,0 +1,12 @@
+{
+  "name": "@planner-ui/clients",
+  "private": true,
+  "version": "1.0.0-alpha",
+  "packageManager": "yarn@4.4.1",
+  "scripts": {
+    "generate": "openapi-generator-cli generate"
+  },
+  "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.13.5"
+  }
+}
