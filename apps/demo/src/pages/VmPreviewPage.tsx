@@ -10,7 +10,7 @@ export const VmPreviewPage: React.FC = () => {
     <>
       <Backdrop style={{ zIndex: 0 }} />
       <Bullseye>
-        <LoginForm vm={vm} />
+        <LoginForm {...vm} />
       </Bullseye>
     </>
   );

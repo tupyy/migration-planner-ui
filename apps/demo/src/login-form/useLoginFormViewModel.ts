@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { AlertVariant } from "@patternfly/react-core";
 import {
   CredentialsApiClient,
+  _setPlannerAgentUrl,
   type Credentials,
 } from "#/clients/CredentialsApi";
 import {
@@ -33,6 +34,9 @@ const _computeFormControlVariant = (
   }
 };
 
+// TODO(jkilzi): Make this go away
+_setPlannerAgentUrl(204);
+
 export function useLoginFormViewModel(): LoginFormViewModel {
   const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
   const formRef = useRef<HTMLFormElement>();
@@ -53,8 +57,7 @@ export function useLoginFormViewModel(): LoginFormViewModel {
       isDataSharingAllowed: form["isDataSharingAllowed"].checked,
     };
     const [statusCodeOK, error] = await CredentialsApiClient.putCredentials(
-      credentials,
-      500
+      credentials
     );
 
     const status = statusCodeOK ?? error.code;
