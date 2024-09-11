@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useMemo, useEffect } from "react";
+import { useState, useRef, useCallback, useMemo } from "react";
 import { useMount, useTitle } from "react-use";
 import { useNavigate } from "react-router-dom";
 import { useInjection } from "inversify-react";
@@ -36,7 +36,7 @@ export interface LoginFormViewModelInterface {
   alertDescriptionList?: Array<{ id: number; text: string }>;
   alertActionLinkText?: string;
   shouldDisplayAlert: boolean;
-  checkFormValidity: React.FormEventHandler<HTMLFormElement>;
+  handleSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 
 const _computeFormControlVariant = (
@@ -54,60 +54,13 @@ const _computeFormControlVariant = (
 };
 
 export const useViewModel = (): LoginFormViewModelInterface => {
+  useTitle(docTitle);
+  const navigateTo = useNavigate();
   const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
   const formRef = useRef<HTMLFormElement>();
-  const eventTargetRef = useRef<EventTarget>(new EventTarget());
-  const navigateTo = useNavigate();
   const credentialsApiClient = useInjection<CredentialsApiInterface>(
     serviceIdentifiers.CredentialsApi
   );
-
-  const handleSubmit = useCallback(async () => {
-    const form = formRef.current;
-    if (!form) {
-      console.log("The form is not mounted yet");
-      return;
-    }
-
-    const credentials: Credentials = {
-      url: form["url"].value,
-      username: form["username"].value,
-      password: form["password"].value,
-      isDataSharingAllowed: form["isDataSharingAllowed"].checked,
-    };
-    const signal = newAbortSignal(
-      REQUEST_TIMEOUT_SECONDS,
-      "The server didn't respond in a timely fashion."
-    );
-    const [statusCodeOK, error] = await credentialsApiClient.putCredentials(
-      credentials,
-      {
-        signal,
-        pathParams: ["/204"],
-      }
-    );
-
-    const status = statusCodeOK ?? error.code;
-    switch (status) {
-      case 204:
-        setFormState(FormStates.Accepted);
-        break;
-      case 400:
-        setFormState(FormStates.Rejected);
-        break;
-      case 401:
-        setFormState(FormStates.InvalidCredentials);
-        break;
-      case 422:
-        setFormState(FormStates.Rejected);
-        break;
-      default:
-        navigateTo(`/error/${error!.code}`, {
-          state: { message: error!.message },
-        });
-        break;
-    }
-  }, [credentialsApiClient, navigateTo]);
 
   useMount(() => {
     const form = formRef.current;
@@ -118,14 +71,6 @@ export const useViewModel = (): LoginFormViewModelInterface => {
     form["isDataSharingAllowed"].checked = DATA_SHARING_ALLOWED_DEFAULT_STATE;
   });
 
-  useEffect(() => {
-    const eventTarget = eventTargetRef.current;
-    eventTarget.addEventListener("loginform/submit", handleSubmit);
-    return (): void => {
-      eventTarget.removeEventListener("loginform/submit", handleSubmit);
-    };
-  }, [handleSubmit]);
-  useTitle(docTitle);
 
   return {
     formState,
@@ -200,8 +145,8 @@ export const useViewModel = (): LoginFormViewModelInterface => {
       () => ![FormStates.Initial, FormStates.Submitting].includes(formState),
       [formState]
     ),
-    checkFormValidity: useCallback<React.FormEventHandler<HTMLFormElement>>(
-      (event): void => {
+    handleSubmit: useCallback<React.FormEventHandler<HTMLFormElement>>(
+      async (event) => {
         event.preventDefault();
         const form = formRef.current;
         if (!form) {
@@ -211,10 +156,50 @@ export const useViewModel = (): LoginFormViewModelInterface => {
         const ok = form.reportValidity();
         if (ok) {
           setFormState(FormStates.Submitting);
-          eventTargetRef.current.dispatchEvent(new Event("loginform/submit"));
+        } else {
+          return;
+        }
+
+        const credentials: Credentials = {
+          url: form["url"].value,
+          username: form["username"].value,
+          password: form["password"].value,
+          isDataSharingAllowed: form["isDataSharingAllowed"].checked,
+        };
+        const signal = newAbortSignal(
+          REQUEST_TIMEOUT_SECONDS,
+          "The server didn't respond in a timely fashion."
+        );
+        const [statusCodeOK, error] = await credentialsApiClient.putCredentials(
+          credentials,
+          {
+            signal,
+            pathParams: ["/204"],
+          }
+        );
+
+        const status = statusCodeOK ?? error.code;
+        switch (status) {
+          case 204:
+            setFormState(FormStates.Accepted);
+            break;
+          case 400:
+            setFormState(FormStates.Rejected);
+            break;
+          case 401:
+            setFormState(FormStates.InvalidCredentials);
+            break;
+          case 422:
+            setFormState(FormStates.Rejected);
+            break;
+          default:
+            navigateTo(`/error/${error!.code}`, {
+              state: { message: error!.message },
+            });
+            break;
         }
       },
-      [formRef]
+      [credentialsApiClient, navigateTo]
     ),
   };
 };

@@ -48,7 +48,7 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
       </CardHeader>
 
       <CardBody id="card-body-description">
-        <Form ref={vm.formRef} onSubmit={vm.checkFormValidity} id="login-form">
+        <Form ref={vm.formRef} onSubmit={vm.handleSubmit} id="login-form">
           <FormGroup label="URL" isRequired fieldId="url-form-control">
             <TextInput
               validated={vm.urlControlStateVariant}
