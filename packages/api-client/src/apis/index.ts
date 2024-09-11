@@ -1,10 +1,15 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from "./ImageApi";
 export {
-  CreateSourceRequest,
-  DeleteSourceRequest,
-  ReadSourceRequest,
-  SourceApiInterface,
+  type GetSourceImageRequest,
+  type ImageApiInterface,
+  ImageApi,
+} from "./ImageApi";
+
+export {
+  type CreateSourceRequest,
+  type DeleteSourceRequest,
+  type ReadSourceRequest,
+  type SourceApiInterface,
   SourceApi,
 } from "./SourceApi";
