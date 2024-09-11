@@ -57,7 +57,6 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               type="url"
               name="url"
               isRequired
-              autoComplete="on"
               placeholder="https://vcenter_server_ip_address_or_fqdn"
               pattern="https://.*"
               aria-describedby="url-helper-text"
@@ -88,7 +87,6 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               type="email"
               name="username"
               isRequired
-              autoComplete="username"
               placeholder="su.do@redhat.com"
               aria-describedby="username-helper-text"
             />
@@ -118,7 +116,6 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               type="password"
               name="password"
               isRequired
-              autoComplete="current-password"
               aria-describedby="password-helper-text"
             />
             {vm.passwordControlHelperText && vm.passwordControlHelperText && (
