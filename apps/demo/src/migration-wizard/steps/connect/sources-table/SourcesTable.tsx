@@ -1,19 +1,18 @@
 import React from "react";
+import type { Source } from "@migration-planner-ui/api-client/models";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import { SourcesTableColumns } from "./SourcesTableColumns";
-import { Source } from "./_FakeSourceData";
 import { SourcesTableEmptyState } from "./SourcesTableEmptyState";
-import { noop } from "#/common/utils";
 
 const VALUE_NOT_AVAILABLE = "-";
 
 export type SourcesTableProps = {
-  sources?: Source[];
-  onAddSources?: () => void;
+  sources: Source[];
+  onAddSources: () => void;
 };
 
 export const SourcesTable: React.FC<SourcesTableProps> = (props) => {
-  const { sources = [], onAddSources = noop } = props;
+  const { sources, onAddSources } = props;
   const hasSources = sources.length > 0;
 
   return (
@@ -33,20 +32,20 @@ export const SourcesTable: React.FC<SourcesTableProps> = (props) => {
       <Tbody>
         {hasSources ? (
           sources.map((src) => (
-            <Tr key={src.uuid}>
+            <Tr key={src.id}>
               <Td dataLabel={SourcesTableColumns.Name}>{src.name}</Td>
               <Td dataLabel={SourcesTableColumns.Status}>{src.status}</Td>
               <Td dataLabel={SourcesTableColumns.Hosts}>
-                {src.hosts?.length ?? VALUE_NOT_AVAILABLE}
+                {src.inventory.infra.totalHosts || VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.VMs}>
-                {src.vms?.length ?? VALUE_NOT_AVAILABLE}
+                {src.inventory.vms.total || VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.Networks}>
-                {src.networks?.length ?? VALUE_NOT_AVAILABLE}
+                {src.inventory.infra.networks.length || VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.Datastores}>
-                {src.datastores?.length ?? VALUE_NOT_AVAILABLE}
+                {src.inventory.infra.datastores.length || VALUE_NOT_AVAILABLE}
               </Td>
             </Tr>
           ))

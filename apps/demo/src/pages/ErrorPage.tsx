@@ -3,7 +3,6 @@ import { css, keyframes } from "@emotion/css";
 import {
   Bullseye,
   Card,
-  CardBody,
   Button,
   TextContent,
   Text,
@@ -54,7 +53,7 @@ type Props = {
   actions?: Array<Omit<ButtonProps, "variant">>;
 };
 
-export const ErrorPage: React.FC<Props> = (props) => {
+const ErrorPage: React.FC<Props> = (props) => {
   const params = useParams();
   const location = useLocation();
 
@@ -70,7 +69,11 @@ export const ErrorPage: React.FC<Props> = (props) => {
     <>
       <Backdrop style={{ zIndex: 0 }} />
       <Bullseye>
-        <Card style={{ width: "36rem", height: "38rem", justifyContent: "center" }} isFlat isRounded>
+        <Card
+          style={{ width: "36rem", height: "38rem", justifyContent: "center" }}
+          isFlat
+          isRounded
+        >
           <EmptyState>
             <EmptyStateBody>
               <EmptyStateIcon
@@ -111,3 +114,5 @@ export const ErrorPage: React.FC<Props> = (props) => {
 };
 
 ErrorPage.displayName = "ErrorPage";
+
+export default ErrorPage;

@@ -80,7 +80,7 @@ const cards: React.ReactElement[] = [
   </Card>,
 ];
 
-export const MigrationAssessmentPage: React.FC = () => (
+const MigrationAssessmentPage: React.FC = () => (
   <AppPage
     breadcrumbs={[
       {
@@ -114,3 +114,5 @@ export const MigrationAssessmentPage: React.FC = () => (
 );
 
 MigrationAssessmentPage.displayName = "MigrationAssessmentPage";
+
+export default MigrationAssessmentPage;

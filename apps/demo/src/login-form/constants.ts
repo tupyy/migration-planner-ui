@@ -1,3 +1,5 @@
+import { Time } from "#/common/Time";
+
 export const docTitle = "Virtualization Migration";
 export const cardTitle = "Virtualization Migration Planner";
 export const cardDescription = `
@@ -10,3 +12,4 @@ export const isDataSharingAllowedCheckboxLabel =
   "I agree to share aggregated data about my environment with Red Hat.";
 
 export const DATA_SHARING_ALLOWED_DEFAULT_STATE = true;
+export const REQUEST_TIMEOUT_SECONDS = 30 * Time.Second;

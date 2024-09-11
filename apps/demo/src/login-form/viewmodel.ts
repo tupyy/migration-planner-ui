@@ -1,24 +1,43 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { useMount, useTitle } from "react-use";
 import { useNavigate } from "react-router-dom";
+import { useInjection } from "inversify-react";
 import { AlertVariant } from "@patternfly/react-core";
+import type { Credentials } from "#/services/agent-api/models";
+import type { CredentialsApiInterface } from "#/services/agent-api/apis/CredentialsApi";
 import {
-  CredentialsApiClient,
-  _setPlannerAgentUrl,
-  type Credentials,
-} from "#/clients/CredentialsApi";
-import {
-  DATA_SHARING_ALLOWED_DEFAULT_STATE,
-  docTitle,
   cardTitle,
   cardDescription,
+  docTitle,
   isDataSharingAllowedCheckboxLabel,
-} from "./constants";
-import {
-  FormStates,
-  FormControlValidatedStateVariant,
-  LoginFormViewModel,
-} from "./types";
+  DATA_SHARING_ALLOWED_DEFAULT_STATE,
+  REQUEST_TIMEOUT_SECONDS,
+} from "./Constants";
+import { serviceIdentifiers } from "#/main/IoC";
+import { newAbortSignal } from "#/common/AbortSignal";
+import { FormStates } from "./FormStates";
+import { FormControlValidatedStateVariant } from "./Aliases";
+
+export interface LoginFormViewModelInterface {
+  formState: FormStates;
+  formRef: React.MutableRefObject<HTMLFormElement | undefined>;
+  cardTitle: string;
+  cardDescription: string;
+  urlControlStateVariant: FormControlValidatedStateVariant;
+  urlControlHelperText?: string;
+  usernameControlStateVariant: FormControlValidatedStateVariant;
+  usernameControlHelperText?: string;
+  passwordControlStateVariant: FormControlValidatedStateVariant;
+  passwordControlHelperText?: string;
+  shouldDisableFormControl: boolean;
+  isDataSharingAllowedCheckboxLabel: string;
+  alertVariant?: AlertVariant;
+  alertTitle?: string;
+  alertDescriptionList?: Array<{ id: number; text: string }>;
+  alertActionLinkText?: string;
+  shouldDisplayAlert: boolean;
+  checkFormValidity: React.FormEventHandler<HTMLFormElement>;
+}
 
 const _computeFormControlVariant = (
   formState: FormStates
@@ -34,14 +53,14 @@ const _computeFormControlVariant = (
   }
 };
 
-// TODO(jkilzi): Make this go away
-_setPlannerAgentUrl(204);
-
-export function useLoginFormViewModel(): LoginFormViewModel {
+export const useViewModel = (): LoginFormViewModelInterface => {
   const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
   const formRef = useRef<HTMLFormElement>();
   const eventTargetRef = useRef<EventTarget>(new EventTarget());
   const navigateTo = useNavigate();
+  const credentialsApiClient = useInjection<CredentialsApiInterface>(
+    serviceIdentifiers.CredentialsApi
+  );
 
   const handleSubmit = useCallback(async () => {
     const form = formRef.current;
@@ -56,8 +75,16 @@ export function useLoginFormViewModel(): LoginFormViewModel {
       password: form["password"].value,
       isDataSharingAllowed: form["isDataSharingAllowed"].checked,
     };
-    const [statusCodeOK, error] = await CredentialsApiClient.putCredentials(
-      credentials
+    const signal = newAbortSignal(
+      REQUEST_TIMEOUT_SECONDS,
+      "The server didn't respond in a timely fashion."
+    );
+    const [statusCodeOK, error] = await credentialsApiClient.putCredentials(
+      credentials,
+      {
+        signal,
+        pathParams: ["/204"],
+      }
     );
 
     const status = statusCodeOK ?? error.code;
@@ -80,7 +107,7 @@ export function useLoginFormViewModel(): LoginFormViewModel {
         });
         break;
     }
-  }, [formRef, navigateTo]);
+  }, [credentialsApiClient, navigateTo]);
 
   useMount(() => {
     const form = formRef.current;
@@ -93,9 +120,9 @@ export function useLoginFormViewModel(): LoginFormViewModel {
 
   useEffect(() => {
     const eventTarget = eventTargetRef.current;
-    eventTarget.addEventListener("submit", handleSubmit);
+    eventTarget.addEventListener("loginform/submit", handleSubmit);
     return (): void => {
-      eventTarget.removeEventListener("submit", handleSubmit);
+      eventTarget.removeEventListener("loginform/submit", handleSubmit);
     };
   }, [handleSubmit]);
   useTitle(docTitle);
@@ -184,10 +211,10 @@ export function useLoginFormViewModel(): LoginFormViewModel {
         const ok = form.reportValidity();
         if (ok) {
           setFormState(FormStates.Submitting);
-          eventTargetRef.current.dispatchEvent(new Event("submit"));
+          eventTargetRef.current.dispatchEvent(new Event("loginform/submit"));
         }
       },
       [formRef]
     ),
   };
-}
+};

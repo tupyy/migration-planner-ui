@@ -2,21 +2,27 @@ import React from "react";
 import { Wizard, WizardStep } from "@patternfly/react-core";
 import { ConnectStepContent } from "./steps/connect/ConnectStepContent";
 import { DiscoveryStepContent } from "./steps/discovery/DiscoveryStepContent";
-import { useComputedHeightFromPageHeader } from "./hooks/useComputedHeightFromPageHeader";
+import { useComputedHeightFromPageHeader } from "./useComputedHeightFromPageHeader";
+import { useViewModel as useConnectStepViewModel } from "./steps/connect/ViewModel";
 
 export const MigrationWizard: React.FC = () => {
-  const height = useComputedHeightFromPageHeader();
+  const computedHeight = useComputedHeightFromPageHeader();
+  const connectStepViewModel = useConnectStepViewModel();
 
   return (
-    <Wizard height={height} title="Migration wizard">
+    <Wizard height={computedHeight} title="Migration wizard">
       <WizardStep
         name="Connect"
         id="connect-step"
-        footer={{ isCancelHidden: true, isNextDisabled: true }}
+        footer={{ isCancelHidden: true, isNextDisabled: false }}
       >
-        <ConnectStepContent />
+        <ConnectStepContent vm={connectStepViewModel} />
       </WizardStep>
-      <WizardStep name="Discovery" id="discovery-step">
+      <WizardStep
+        name="Discovery"
+        id="discovery-step"
+        footer={{ isCancelHidden: true }}
+      >
         <DiscoveryStepContent />
       </WizardStep>
     </Wizard>

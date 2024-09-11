@@ -14,6 +14,7 @@ import {
 } from "@patternfly/react-core";
 import { SourcesTable } from "./sources-table/SourcesTable";
 import { ClusterIcon } from "@patternfly/react-icons";
+import { ConnectStepViewModelInterface } from "./ViewModel";
 
 const InstructionsList: React.FC = () => (
   <TextContent style={{ paddingBlock: "1rem" }}>
@@ -38,7 +39,16 @@ const InstructionsList: React.FC = () => (
   </TextContent>
 );
 
-export const ConnectStepContent: React.FC = () => {
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace ConnectStepContent {
+  export type Props = { vm: ConnectStepViewModelInterface };
+}
+
+export const ConnectStepContent: React.FC<ConnectStepContent.Props> = (
+  props
+) => {
+  const { vm } = props;
+
   return (
     <Stack hasGutter>
       <StackItem>
@@ -46,23 +56,24 @@ export const ConnectStepContent: React.FC = () => {
           <Text component="h2">Connect your VMware environment</Text>
         </TextContent>
       </StackItem>
-      <StackItem>
-        <InstructionsList />
-      </StackItem>
+      <StackItem>{vm.sources?.length > 0 && <InstructionsList />}</StackItem>
       <StackItem>
         <Panel variant="bordered">
           <PanelMain>
             <PanelHeader style={{ paddingBlockEnd: 0 }}>
               <TextContent>
                 <Text component="h3">
-                  <Icon isInline style={{ marginRight: "0.5em" }}>
+                  <Icon isInline style={{ marginRight: "1rem" }}>
                     <ClusterIcon />
                   </Icon>
                   Environment
                 </Text>
               </TextContent>
             </PanelHeader>
-            <SourcesTable />
+            <SourcesTable
+              sources={vm.sources ?? []}
+              onAddSources={vm.handleAddSources}
+            />
           </PanelMain>
         </Panel>
       </StackItem>

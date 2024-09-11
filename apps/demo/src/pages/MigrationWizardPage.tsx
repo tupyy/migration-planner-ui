@@ -2,7 +2,7 @@ import React from "react";
 import { AppPage } from "#/common/components/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
 
-export const MigrationWizardPage: React.FC = () => {
+const MigrationWizardPage: React.FC = () => {
   return (
     <AppPage
       breadcrumbs={[
@@ -17,3 +17,5 @@ export const MigrationWizardPage: React.FC = () => {
 };
 
 MigrationWizardPage.displayName = "MigrationWizardPage";
+
+export default MigrationWizardPage;

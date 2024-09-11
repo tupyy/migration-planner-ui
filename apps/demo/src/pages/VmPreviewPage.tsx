@@ -1,19 +1,21 @@
 import React from "react";
 import { Bullseye, Backdrop } from "@patternfly/react-core";
-import { useLoginFormViewModel } from "#/login-form/useLoginFormViewModel";
 import { LoginForm } from "#/login-form/LoginForm";
+import { useViewModel } from "#/login-form/ViewModel";
 
-export const VmPreviewPage: React.FC = () => {
-  const vm = useLoginFormViewModel();
+const VmPreviewPage: React.FC = () => {
+  const vm = useViewModel();
 
   return (
     <>
       <Backdrop style={{ zIndex: 0 }} />
       <Bullseye>
-        <LoginForm {...vm} />
+        <LoginForm vm={vm} />
       </Bullseye>
     </>
   );
 };
 
 VmPreviewPage.displayName = "VmPreviewPage";
+
+export default VmPreviewPage;

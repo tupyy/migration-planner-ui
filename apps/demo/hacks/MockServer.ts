@@ -1,6 +1,6 @@
 import express from "express";
 import morgan from "morgan";
-import { Time, sleep } from "#/common/time";
+import { Time, sleep } from "#/common/Time";
 
 const app = express();
 

@@ -25,6 +25,6 @@ module.exports = {
         ignoreRestSiblings: true,
       },
     ],
-    "@typescript-eslint/explicit-function-return-type": "error",
+    "@typescript-eslint/explicit-function-return-type": "warn",
   },
 };
