@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import type { Source } from "@migration-planner-ui/api-client/models";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import {
@@ -132,17 +132,17 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                 </Split>
               </Td>
               <Td dataLabel={SourcesTableColumns.Hosts}>
-                {src.inventory.infra.totalHosts || VALUE_NOT_AVAILABLE}
+                {src.inventory?.infra.totalHosts || VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.VMs}>
-                {src.inventory.vms.total || VALUE_NOT_AVAILABLE}
+                {src.inventory?.vms.total || VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.Networks}>
-                {(src.inventory.infra.networks ?? []).length ||
+                {(src.inventory?.infra.networks ?? []).length ||
                   VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.Datastores}>
-                {(src.inventory.infra.datastores ?? []).length ||
+                {(src.inventory?.infra.datastores ?? []).length ||
                   VALUE_NOT_AVAILABLE}
               </Td>
               <Td dataLabel={SourcesTableColumns.Actions}>
