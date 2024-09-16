@@ -3,7 +3,7 @@ import { Bullseye, Backdrop } from "@patternfly/react-core";
 import { LoginForm } from "#/login-form/LoginForm";
 import { useViewModel } from "#/login-form/ViewModel";
 
-const VmPreviewPage: React.FC = () => {
+const AgentLoginPage: React.FC = () => {
   const vm = useViewModel();
 
   return (
@@ -16,6 +16,6 @@ const VmPreviewPage: React.FC = () => {
   );
 };
 
-VmPreviewPage.displayName = "VmPreviewPage";
+AgentLoginPage.displayName = "AgentLoginPage";
 
-export default VmPreviewPage;
+export default AgentLoginPage;

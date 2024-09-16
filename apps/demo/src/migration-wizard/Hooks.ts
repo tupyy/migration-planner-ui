@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useWindowSize } from "react-use";
-
-const DEFAULT_HEIGHT = 635;
+import { DEFAULT_HEIGHT } from "./Constants";
 
 function getMainPageSectionVerticalPadding(pageMainSection: Element): number {
   const { paddingTop, paddingBottom } = getComputedStyle(pageMainSection);

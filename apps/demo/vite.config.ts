@@ -5,7 +5,10 @@ import mix from "./hacks/VitePluginMix";
 
 // https://vitejs.dev/config/
 export default defineConfig((env) => {
-  const plugins = [tsconfigPaths(), react()];
+  const plugins = [
+    tsconfigPaths(),
+    react(),
+  ];
   switch (env.mode) {
     case "production":
       break;
@@ -24,10 +27,15 @@ export default defineConfig((env) => {
     plugins,
     server: {
       proxy: {
-        "/planner": {
-          target: "http://172.17.0.3:3443",
+        "/planner/api": {
+          target: "http://172.17.0.2:3443",
           changeOrigin: true,
           rewrite: (path): string => path.replace(/^\/planner/, ""),
+        },
+        "/agent/api": {
+          target: "http://172.17.0.2:3333",
+          changeOrigin: true,
+          rewrite: (path): string => path.replace(/^\/agent/, ""),
         },
       },
     },

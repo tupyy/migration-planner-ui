@@ -1,23 +1,38 @@
 import type { Either } from "#/common/Types";
-import { Credentials } from "#/services/agent-api/models/Credentials";
-import { CredentialsError } from "#/services/agent-api/models/CredentialsError";
+import {
+  type Credentials,
+  type StatusReply,
+  CredentialsError,
+} from "#/services/agent/models";
 
 interface Configuration {
   basePath: string;
 }
 
-export interface CredentialsApiInterface {
+export interface AgentApiInterface {
   putCredentials(
     credentials: Credentials,
     options?: RequestInit & { pathParams?: string[] }
   ): Promise<Either<number, CredentialsError>>;
+  getStatus(options?: RequestInit): Promise<StatusReply>;
 }
 
-export class CredentialsApi implements CredentialsApiInterface {
+export class AgentApi implements AgentApiInterface {
   private readonly configuration: Configuration;
 
   constructor(configuration: Configuration) {
     this.configuration = configuration;
+  }
+
+  async getStatus(options?: RequestInit): Promise<StatusReply> {
+    const request = new Request(this.configuration.basePath + "/status", {
+      method: "GET",
+      ...(options?.signal && { signal: options.signal }),
+    });
+
+    const response = await fetch(request);
+    const statusReply = (await response.json()) as StatusReply;
+    return statusReply;
   }
 
   async putCredentials(
@@ -26,7 +41,7 @@ export class CredentialsApi implements CredentialsApiInterface {
   ): Promise<Either<number, CredentialsError>> {
     const request = new Request(
       this.configuration.basePath +
-        "/api/credentials" +
+        "/credentials" +
         (options?.pathParams ?? ["/"]).join("/"),
       {
         method: "PUT",

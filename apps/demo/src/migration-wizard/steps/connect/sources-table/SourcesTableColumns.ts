@@ -5,4 +5,5 @@ export const enum SourcesTableColumns {
   VMs = "VMs",
   Networks = "Networks",
   Datastores = "Datastores",
+  Actions = "Actions",
 }

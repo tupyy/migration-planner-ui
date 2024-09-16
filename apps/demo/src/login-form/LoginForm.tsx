@@ -42,8 +42,15 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
     >
       <CardHeader id="card-header-title">
         <TextContent>
-          <Text component="h2">{vm.cardTitle}</Text>
-          <Text>{vm.cardDescription}</Text>
+          <Text component="h2">"Virtualization Migration Planner"</Text>
+          <Text>
+            The Migration Planner requires access to your VMware environment to
+            execute a comprehensive discovery process that gathers essential
+            data, including network topology, storage configuration, and virtual
+            machine inventory. The process leverages this information to provide
+            tailored recommendations for a seamless workload transition to
+            OpenShift Virtualization.
+          </Text>
         </TextContent>
       </CardHeader>
 
@@ -137,7 +144,7 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               isDisabled={vm.shouldDisableFormControl}
               id="checkbox-form-control"
               name="isDataSharingAllowed"
-              label={vm.isDataSharingAllowedCheckboxLabel}
+              label="I agree to share aggregated data about my environment with Red Hat."
               aria-label="Share aggregated data"
             />
           </FormGroup>

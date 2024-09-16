@@ -33,11 +33,7 @@ export const router = createBrowserRouter([
 
   // These are not exposed in the App, are chunk-splitted and therefore lazy loaded
   {
-    path: "/preview",
-    element: <Navigate to="/preview/ocm" />,
-  },
-  {
-    path: "/preview/ocm",
+    path: "/ocm",
     lazy: async () => {
       const { default: OcmPreviewPage } = await import(
         "#/pages/OcmPreviewPage"
@@ -49,12 +45,12 @@ export const router = createBrowserRouter([
     },
   },
   {
-    path: "/preview/vm",
+    path: "/agent/login",
     lazy: async () => {
-      const { default: VmPreviewPage } = await import("#/pages/VmPreviewPage");
+      const { default: AgentLoginPage } = await import("#/pages/AgentLoginPage");
 
       return {
-        Component: VmPreviewPage,
+        Component: AgentLoginPage,
       };
     },
   },

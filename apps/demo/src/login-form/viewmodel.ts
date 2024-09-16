@@ -1,28 +1,22 @@
 import { useState, useRef, useCallback, useMemo } from "react";
 import { useMount, useTitle } from "react-use";
 import { useNavigate } from "react-router-dom";
-import { useInjection } from "inversify-react";
 import { AlertVariant } from "@patternfly/react-core";
-import type { Credentials } from "#/services/agent-api/models";
-import type { CredentialsApiInterface } from "#/services/agent-api/apis/CredentialsApi";
+import type { Credentials } from "#/services/agent/models";
+import type { AgentApiInterface } from "#/services/agent/AgentApi";
 import {
-  cardTitle,
-  cardDescription,
-  docTitle,
-  isDataSharingAllowedCheckboxLabel,
   DATA_SHARING_ALLOWED_DEFAULT_STATE,
   REQUEST_TIMEOUT_SECONDS,
 } from "./Constants";
-import { serviceIdentifiers } from "#/main/IoC";
 import { newAbortSignal } from "#/common/AbortSignal";
 import { FormStates } from "./FormStates";
 import { FormControlValidatedStateVariant } from "./Aliases";
+import { useInjection } from "#/ioc";
+import { Symbols } from "#/main/Symbols";
 
 export interface LoginFormViewModelInterface {
   formState: FormStates;
   formRef: React.MutableRefObject<HTMLFormElement | undefined>;
-  cardTitle: string;
-  cardDescription: string;
   urlControlStateVariant: FormControlValidatedStateVariant;
   urlControlHelperText?: string;
   usernameControlStateVariant: FormControlValidatedStateVariant;
@@ -30,7 +24,6 @@ export interface LoginFormViewModelInterface {
   passwordControlStateVariant: FormControlValidatedStateVariant;
   passwordControlHelperText?: string;
   shouldDisableFormControl: boolean;
-  isDataSharingAllowedCheckboxLabel: string;
   alertVariant?: AlertVariant;
   alertTitle?: string;
   alertDescriptionList?: Array<{ id: number; text: string }>;
@@ -54,12 +47,12 @@ const _computeFormControlVariant = (
 };
 
 export const useViewModel = (): LoginFormViewModelInterface => {
-  useTitle(docTitle);
+  useTitle("Virtualization Migration");
   const navigateTo = useNavigate();
   const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
   const formRef = useRef<HTMLFormElement>();
-  const credentialsApiClient = useInjection<CredentialsApiInterface>(
-    serviceIdentifiers.CredentialsApi
+  const AgentApiClient = useInjection<AgentApiInterface>(
+    Symbols.AgentApi
   );
 
   useMount(() => {
@@ -71,12 +64,9 @@ export const useViewModel = (): LoginFormViewModelInterface => {
     form["isDataSharingAllowed"].checked = DATA_SHARING_ALLOWED_DEFAULT_STATE;
   });
 
-
   return {
     formState,
     formRef,
-    cardTitle,
-    cardDescription,
     urlControlStateVariant: useMemo<FormControlValidatedStateVariant>(() => {
       switch (formState) {
         case FormStates.Accepted:
@@ -95,7 +85,6 @@ export const useViewModel = (): LoginFormViewModelInterface => {
       () => [FormStates.Submitting, FormStates.Accepted].includes(formState),
       [formState]
     ),
-    isDataSharingAllowedCheckboxLabel,
     alertVariant: useMemo(() => {
       switch (formState) {
         case FormStates.Accepted:
@@ -170,11 +159,10 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           REQUEST_TIMEOUT_SECONDS,
           "The server didn't respond in a timely fashion."
         );
-        const [statusCodeOK, error] = await credentialsApiClient.putCredentials(
+        const [statusCodeOK, error] = await AgentApiClient.putCredentials(
           credentials,
           {
             signal,
-            pathParams: ["/204"],
           }
         );
 
@@ -199,7 +187,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
             break;
         }
       },
-      [credentialsApiClient, navigateTo]
+      [AgentApiClient, navigateTo]
     ),
   };
 };

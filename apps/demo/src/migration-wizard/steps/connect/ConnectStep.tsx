@@ -11,10 +11,13 @@ import {
   OrderType,
   ListItem,
   Icon,
+  Alert,
+  AlertActionLink,
 } from "@patternfly/react-core";
-import { SourcesTable } from "./sources-table/SourcesTable";
 import { ClusterIcon } from "@patternfly/react-icons";
-import { ConnectStepViewModelInterface } from "./ViewModel";
+import { type Source } from "@migration-planner-ui/api-client/models";
+import { type AsyncStateRetry } from "react-use/lib/useAsyncRetry";
+import { SourcesTable } from "./sources-table/SourcesTable";
 
 const InstructionsList: React.FC = () => (
   <TextContent style={{ paddingBlock: "1rem" }}>
@@ -40,14 +43,15 @@ const InstructionsList: React.FC = () => (
 );
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace ConnectStepContent {
-  export type Props = { vm: ConnectStepViewModelInterface };
+export namespace ConnectStep {
+  export type Props = {
+    sources: Readonly<AsyncStateRetry<Source[]>>;
+  };
 }
 
-export const ConnectStepContent: React.FC<ConnectStepContent.Props> = (
-  props
-) => {
-  const { vm } = props;
+export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
+  const { sources } = props;
+  const hasSources = (sources.value ?? []).length > 0;
 
   return (
     <Stack hasGutter>
@@ -56,7 +60,33 @@ export const ConnectStepContent: React.FC<ConnectStepContent.Props> = (
           <Text component="h2">Connect your VMware environment</Text>
         </TextContent>
       </StackItem>
-      <StackItem>{vm.sources?.length > 0 && <InstructionsList />}</StackItem>
+      <StackItem>
+        <InstructionsList />
+        {hasSources && (
+          <Alert
+            isInline
+            variant="custom"
+            title="Discovery VM"
+            actionLinks={
+              <AlertActionLink
+                component="a"
+                href="http://127.0.0.1:5173/preview/vm"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {sources.value![0].credentialUrl}
+              </AlertActionLink>
+            }
+          >
+            <TextContent>
+              <Text>
+                Click the link below to connect the Discovery Source to your
+                VMware environment.
+              </Text>
+            </TextContent>
+          </Alert>
+        )}
+      </StackItem>
       <StackItem>
         <Panel variant="bordered">
           <PanelMain>
@@ -70,10 +100,7 @@ export const ConnectStepContent: React.FC<ConnectStepContent.Props> = (
                 </Text>
               </TextContent>
             </PanelHeader>
-            <SourcesTable
-              sources={vm.sources ?? []}
-              onAddSources={vm.handleAddSources}
-            />
+            <SourcesTable sources={sources} />
           </PanelMain>
         </Panel>
       </StackItem>
@@ -81,4 +108,4 @@ export const ConnectStepContent: React.FC<ConnectStepContent.Props> = (
   );
 };
 
-ConnectStepContent.displayName = "ConnectStepContent";
+ConnectStep.displayName = "ConnectStep";

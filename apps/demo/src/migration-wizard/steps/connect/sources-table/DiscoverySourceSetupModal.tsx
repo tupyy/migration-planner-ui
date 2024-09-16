@@ -1,0 +1,92 @@
+import React from "react";
+import {
+  Button,
+  Form,
+  FormGroup,
+  FormHelperText,
+  HelperText,
+  HelperTextItem,
+  TextInput,
+} from "@patternfly/react-core";
+import {
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+} from "@patternfly/react-core/next";
+
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace DiscoverySourceSetupModal {
+  export type Props = {
+    isOpen?: boolean;
+    onClose?: ((event: KeyboardEvent | React.MouseEvent) => void) | undefined;
+    onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
+  };
+}
+
+export const DiscoverySourceSetupModal: React.FC<
+  DiscoverySourceSetupModal.Props
+> = (props) => {
+  const { isOpen = false, onClose, onSubmit } = props;
+
+  return (
+    <Modal
+      variant="small"
+      isOpen={isOpen}
+      onClose={onClose}
+      ouiaId="DiscoverySourceSetupModal"
+      aria-labelledby="discovery-source-setup-modal-title"
+      aria-describedby="modal-box-body-discovery-source-setup"
+    >
+      <ModalHeader
+        title="Discovery source setup"
+        labelId="discovery-source-setup-modal-title"
+      />
+      <ModalBody id="modal-box-body-discovery-source-setup">
+        <Form
+          noValidate={false}
+          id="discovery-source-setup-form"
+          onSubmit={onSubmit}
+        >
+          <FormGroup
+            label="Name"
+            isRequired
+            fieldId="discovery-source-name-form-control"
+          >
+            <TextInput
+              id="discovery-source-name-form-control"
+              name="discoverySourceName"
+              type="text"
+              placeholder="Example: ams-vcenter-prod-1"
+              pattern="^[a-zA-Z][a-zA-Z0-9_\-]*$"
+              maxLength={50}
+              minLength={1}
+              isRequired
+              aria-describedby="name-helper-text"
+            />
+            <FormHelperText>
+              <HelperText>
+                <HelperTextItem variant="default" id="name-helper-text">
+                  Name the discovery source to help track its deployment
+                  environment.
+                </HelperTextItem>
+              </HelperText>
+            </FormHelperText>
+          </FormGroup>
+        </Form>
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          form="discovery-source-setup-form"
+          type="submit"
+          key="confirm"
+          variant="primary"
+        >
+          Download
+        </Button>
+      </ModalFooter>
+    </Modal>
+  );
+};
+
+DiscoverySourceSetupModal.displayName = "DiscoverySourceSetupModal";

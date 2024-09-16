@@ -2447,8 +2447,6 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.2"
     eslint-plugin-react-refresh: "npm:^0.4.7"
     express: "npm:^4.19.2"
-    inversify: "npm:^6.0.2"
-    inversify-react: "npm:^1.1.1"
     lodash: "npm:^4.17.21"
     morgan: "npm:^1.10.0"
     prop-types: "npm:^15.8.1"
@@ -2458,7 +2456,6 @@ __metadata:
     react-redux: "npm:^9.1.2"
     react-router-dom: "npm:^6.26.0"
     react-use: "npm:^17.5.1"
-    reflect-metadata: "npm:^0.2.2"
     typescript: "npm:^5.2.2"
     vite: "npm:^5.3.4"
     vite-plugin-mix: "npm:^0.4.0"
@@ -3636,23 +3633,6 @@ __metadata:
     through: "npm:^2.3.6"
     wrap-ansi: "npm:^6.0.1"
   checksum: 10c0/eb5724de1778265323f3a68c80acfa899378cb43c24cdcb58661386500e5696b6b0b6c700e046b7aa767fe7b4823c6f04e6ddc268173e3f84116112529016296
-  languageName: node
-  linkType: hard
-
-"inversify-react@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "inversify-react@npm:1.1.1"
-  peerDependencies:
-    inversify: ^5.0.5 || ^6.0.1
-    react: ^16.3.0 || ^17.0.0 || ^18.0.0
-  checksum: 10c0/b1cea46c765bfdb139a412276f59cb4f9aaa501ed7cd6b166c6fbd0f1f4087f8f130463f00143ad1091b0b428223801e6bddbf8d5a569dc76f2fee11228cd955
-  languageName: node
-  linkType: hard
-
-"inversify@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "inversify@npm:6.0.2"
-  checksum: 10c0/ac532c9a6e45785dcfd5117f19b5c1705a7ebddf432152cd2d5be3e951d9745fec9ae3c39c166b34945458b4eda3e37afae6a63cccc5033d545b450d54221220
   languageName: node
   linkType: hard
 
@@ -5209,13 +5189,6 @@ __metadata:
   version: 0.1.13
   resolution: "reflect-metadata@npm:0.1.13"
   checksum: 10c0/728bff0b376b05639fd11ed80c648b61f7fe653c5b506d7ca118e58b6752b9b00810fe0c86227ecf02bd88da6251ab3eb19fd403aaf2e9ff5ef36a2fda643026
-  languageName: node
-  linkType: hard
-
-"reflect-metadata@npm:^0.2.2":
-  version: 0.2.2
-  resolution: "reflect-metadata@npm:0.2.2"
-  checksum: 10c0/1cd93a15ea291e420204955544637c264c216e7aac527470e393d54b4bb075f10a17e60d8168ec96600c7e0b9fcc0cb0bb6e91c3fbf5b0d8c9056f04e6ac1ec2
   languageName: node
   linkType: hard
 
