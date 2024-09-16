@@ -29,6 +29,7 @@ function getConfiguredContainer(): Container {
 function main(): void {
   const root = document.getElementById("root");
   if (root) {
+    root.style.height = "inherit";
     const container = getConfiguredContainer();
     ReactDOM.createRoot(root).render(
       <React.StrictMode>

@@ -51,7 +51,6 @@ export namespace ConnectStep {
 
 export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
   const { sources } = props;
-  const hasSources = (sources.value ?? []).length > 0;
 
   return (
     <Stack hasGutter>
@@ -62,7 +61,7 @@ export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
       </StackItem>
       <StackItem>
         <InstructionsList />
-        {hasSources && (
+        {sources.value?.[0]?.credentialUrl && (
           <Alert
             isInline
             variant="custom"

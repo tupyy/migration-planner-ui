@@ -37,16 +37,16 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
   const [shouldShowConfirmationModal, setShouldShowConfirmationModal] =
     useState(false);
   const toggleConfirmationModal = useCallback((): void => {
-    setShouldShowConfirmationModal(!shouldShowConfirmationModal);
-  }, [shouldShowConfirmationModal]);
+    setShouldShowConfirmationModal((lastState) => !lastState);
+  }, []);
 
   const [
     shouldShowDiscoverySourceSetupModal,
     setShouldShowDiscoverySetupModal,
   ] = useState(false);
   const toggleDiscoverySourceSetupModal = useCallback((): void => {
-    setShouldShowDiscoverySetupModal(!shouldShowDiscoverySourceSetupModal);
-  }, [shouldShowDiscoverySourceSetupModal]);
+    setShouldShowDiscoverySetupModal((lastState) => !lastState);
+  }, []);
 
   const sourceApi = useInjection<SourceApiInterface>(Symbols.SourceApi);
 
@@ -60,20 +60,21 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
   const [downloadHandlerState, handleDownload] = useAsyncFn(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      event.stopPropagation()
+      event.stopPropagation();
       const form = event.currentTarget;
       const name = form["discoverySourceName"].value;
-
+      
       const newSource = await sourceApi.createSource({
         sourceCreate: { name },
       });
-
+      
       const anchor = document.createElement("a");
       anchor.download = newSource.name + ".ova";
       anchor.href = `/planner/api/v1/sources/${newSource.id}/image`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+      toggleDiscoverySourceSetupModal();
 
       return newSource;
 
@@ -158,25 +159,27 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                     </Icon>
                   </Button>
                 </Tooltip>
-                <ConfirmationModal
-                  title="Remove discovery source?"
-                  isOpen={shouldShowConfirmationModal}
-                  onCancel={toggleConfirmationModal}
-                  onConfirm={(event) => {
-                    event.stopPropagation();
-                    handleDeleteSource(src.id);
-                    toggleConfirmationModal();
-                  }}
-                >
-                  <TextContent>
-                    <Text
-                      id="confirmation-modal-description"
-                      style={{ textAlign: "center" }}
-                    >
-                      The discovery information will be lost.
-                    </Text>
-                  </TextContent>
-                </ConfirmationModal>
+                {shouldShowConfirmationModal && (
+                  <ConfirmationModal
+                    title="Remove discovery source?"
+                    isOpen={shouldShowConfirmationModal}
+                    onCancel={toggleConfirmationModal}
+                    onConfirm={(event) => {
+                      event.stopPropagation();
+                      handleDeleteSource(src.id);
+                      toggleConfirmationModal();
+                    }}
+                  >
+                    <TextContent>
+                      <Text
+                        id="confirmation-modal-description"
+                        style={{ textAlign: "center" }}
+                      >
+                        The discovery information will be lost.
+                      </Text>
+                    </TextContent>
+                  </ConfirmationModal>
+                )}
               </Td>
             </Tr>
           ))
@@ -189,11 +192,13 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                 onCreateDiscoverySource={toggleDiscoverySourceSetupModal}
               />
 
-              <DiscoverySourceSetupModal
-                isOpen={shouldShowDiscoverySourceSetupModal}
-                onClose={toggleDiscoverySourceSetupModal}
-                onSubmit={handleDownload}
-              />
+              {shouldShowDiscoverySourceSetupModal && (
+                <DiscoverySourceSetupModal
+                  isOpen={shouldShowDiscoverySourceSetupModal}
+                  onClose={toggleDiscoverySourceSetupModal}
+                  onSubmit={handleDownload}
+                />
+              )}
             </Td>
           </Tr>
         )}

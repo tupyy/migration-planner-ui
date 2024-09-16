@@ -89,7 +89,7 @@ export const SourcesTableEmptyState: React.FC<SourcesTableEmptyState.Props> = (
                 onClick={onCreateDiscoverySource}
                 isDisabled={isCreateDiscoverySourceDisabled}
               >
-                Create discovery source
+                Create
               </Button>
             </EmptyStateActions>
           </EmptyStateFooter>
