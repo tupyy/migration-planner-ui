@@ -55,13 +55,13 @@ export interface Source {
      * @type {Inventory}
      * @memberof Source
      */
-    inventory: Inventory;
+    inventory?: Inventory;
     /**
      * 
      * @type {string}
      * @memberof Source
      */
-    credentialUrl: string;
+    credentialUrl?: string;
     /**
      * 
      * @type {Date}
@@ -98,8 +98,6 @@ export function instanceOfSource(value: object): value is Source {
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('status' in value) || value['status'] === undefined) return false;
     if (!('statusInfo' in value) || value['statusInfo'] === undefined) return false;
-    if (!('inventory' in value) || value['inventory'] === undefined) return false;
-    if (!('credentialUrl' in value) || value['credentialUrl'] === undefined) return false;
     if (!('createdAt' in value) || value['createdAt'] === undefined) return false;
     if (!('updatedAt' in value) || value['updatedAt'] === undefined) return false;
     return true;
@@ -119,8 +117,8 @@ export function SourceFromJSONTyped(json: any, ignoreDiscriminator: boolean): So
         'name': json['name'],
         'status': json['status'],
         'statusInfo': json['statusInfo'],
-        'inventory': InventoryFromJSON(json['inventory']),
-        'credentialUrl': json['credentialUrl'],
+        'inventory': json['inventory'] == null ? undefined : InventoryFromJSON(json['inventory']),
+        'credentialUrl': json['credentialUrl'] == null ? undefined : json['credentialUrl'],
         'createdAt': (new Date(json['createdAt'])),
         'updatedAt': (new Date(json['updatedAt'])),
     };
