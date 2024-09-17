@@ -9,7 +9,8 @@
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers-contrib/features/act:1": {},
     "ghcr.io/devcontainers-contrib/features/fzf:1": {},
-    "ghcr.io/devcontainers/features/java:1": {}
+    "ghcr.io/devcontainers/features/java:1": {},
+    "ghcr.io/devcontainers-community/features/deno:1": {}
   },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
