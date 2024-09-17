@@ -1,5 +1,5 @@
 {
-  "name": "@planner-ui/clients",
+  "name": "@migration-planner-ui/codgen",
   "private": true,
   "version": "1.0.0-alpha",
   "packageManager": "yarn@4.4.1",
