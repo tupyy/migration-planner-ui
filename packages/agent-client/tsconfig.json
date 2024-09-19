@@ -8,7 +8,9 @@
     "moduleResolution": "Bundler",
     "rootDir": "src",
     "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "paths": {
+      "#/*": ["./src/*"]
+    }
   },
   "exclude": ["dist", "node_modules"]
 }

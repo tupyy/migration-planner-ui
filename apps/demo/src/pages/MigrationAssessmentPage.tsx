@@ -16,8 +16,8 @@ import {
 } from "@patternfly/react-core";
 import { ClusterIcon, MigrationIcon } from "@patternfly/react-icons";
 import globalActiveColor300 from "@patternfly/react-tokens/dist/esm/global_active_color_300";
-import { AppPage } from "#/common/components/AppPage";
-import { CustomEnterpriseIcon } from "#/common/components/CustomEnterpriseIcon";
+import { AppPage } from "#/common/AppPage";
+import { CustomEnterpriseIcon } from "#/migration-wizard/CustomEnterpriseIcon";
 
 const cards: React.ReactElement[] = [
   <Card isFullHeight isPlain key="card-1">

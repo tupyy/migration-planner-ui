@@ -1,5 +1,5 @@
 import React from "react";
-import { AppPage } from "#/common/components/AppPage";
+import { AppPage } from "#/common/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
 
 const MigrationWizardPage: React.FC = () => {

@@ -1,0 +1,49 @@
+{
+  "name": "@migration-planner-ui/ioc",
+  "version": "1.0.0-alpha",
+  "description": "A basic IoC solution for React apps (inspired by InversifyJs)",
+  "author": "Jonathan Kilzi <jkilzi@redhat.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jkilzi/migration-planner-ui.git",
+    "directory": "packages/ioc"
+  },
+  "exports": {
+    ".": [
+      "./src/index.ts",
+      "./dist/index.d.ts"
+    ]
+  },
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./src/index.ts",
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "clean": "rm -rf node_modules dist",
+    "prepare": "npm run build"
+  },
+  "devDependencies": {
+    "@patternfly/react-core": "*",
+    "@patternfly/react-icons": "*",
+    "@patternfly/react-tokens": "*",
+    "react": "*",
+    "react-dom": "*",
+    "react-router-dom": "*",
+    "typescript": "^5.6.2"
+  },
+  "peerDependencies": {
+    "@patternfly/react-core": "^5.4.0",
+    "@patternfly/react-icons": "^5.4.0",
+    "@patternfly/react-tokens": "^5.4.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  }
+}

@@ -1,12 +1,12 @@
 import React from "react";
+import { useAsyncRetry } from "react-use";
 import { Wizard, WizardStep } from "@patternfly/react-core";
+import { SourceApiInterface } from "@migration-planner-ui/api-client/apis";
 import { ConnectStep } from "#/migration-wizard/steps/connect/ConnectStep";
 import { DiscoveryStep } from "#/migration-wizard/steps/discovery/DiscoveryStep";
-import { useComputedHeightFromPageHeader } from "#/migration-wizard/Hooks";
-import { useInjection } from "#/ioc";
+import { useComputedHeightFromPageHeader } from "#/migration-wizard/hooks/UseComputedHeightFromPageHeader";
+import { useInjection } from "@migration-planner-ui/ioc";
 import { Symbols } from "#/main/Symbols";
-import { SourceApiInterface } from "@migration-planner-ui/api-client/apis";
-import { useAsyncRetry } from "react-use";
 
 export const MigrationWizard: React.FC = () => {
   const computedHeight = useComputedHeightFromPageHeader();
@@ -16,26 +16,28 @@ export const MigrationWizard: React.FC = () => {
     return sources;
   }, []);
   const hasSources = (state.value ?? []).length > 0;
-  const atLeastOnceSourceIsReady =
-    state.value?.some((src) => src.status === "up-to-date") ?? false;
+  const discoverySourceIsUpToDate = state.value?.[0]?.status === "up-to-date";
 
   return (
-    <Wizard height={computedHeight} title="Migration wizard">
+    <Wizard height={computedHeight}>
       <WizardStep
         name="Connect"
         id="connect-step"
         footer={{
           isCancelHidden: true,
-          isNextDisabled: !hasSources || !atLeastOnceSourceIsReady,
+          isNextDisabled: !hasSources || !discoverySourceIsUpToDate,
         }}
       >
         <ConnectStep sources={state} />
       </WizardStep>
       <WizardStep
-        name="Discovery"
+        name="Discover"
         id="discovery-step"
         footer={{ isCancelHidden: true }}
       >
+        <DiscoveryStep />
+      </WizardStep>
+      <WizardStep name="Plan" id="plan-step" footer={{ isCancelHidden: true }}>
         <DiscoveryStep />
       </WizardStep>
     </Wizard>

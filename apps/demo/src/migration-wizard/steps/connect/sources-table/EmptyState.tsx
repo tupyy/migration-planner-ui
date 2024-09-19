@@ -18,6 +18,7 @@ export namespace SourcesTableEmptyState {
     variant?: "loading" | "error";
     isCreateDiscoverySourceDisabled?: boolean;
     onCreateDiscoverySource?: React.MouseEventHandler<HTMLButtonElement>;
+    onDetectionError: React.MouseEventHandler<HTMLButtonElement>;
   };
 }
 
@@ -27,6 +28,7 @@ export const SourcesTableEmptyState: React.FC<SourcesTableEmptyState.Props> = (
   const {
     variant,
     onCreateDiscoverySource,
+    onDetectionError,
     isCreateDiscoverySourceDisabled = false,
   } = props;
 
@@ -58,12 +60,12 @@ export const SourcesTableEmptyState: React.FC<SourcesTableEmptyState.Props> = (
             }
           />
           <EmptyStateBody>
-            An error occurred while attempting to discover existing discovery
+            An error occurred while attempting to detect existing discovery
             sources
           </EmptyStateBody>
           <EmptyStateFooter>
             <EmptyStateActions>
-              <Button variant="link" onClick={onCreateDiscoverySource}>
+              <Button variant="link" onClick={onDetectionError}>
                 Try again
               </Button>
             </EmptyStateActions>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Button,
   Form,
@@ -28,6 +28,15 @@ export const DiscoverySourceSetupModal: React.FC<
   DiscoverySourceSetupModal.Props
 > = (props) => {
   const { isOpen = false, onClose, onSubmit } = props;
+  const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
+    (event) => {
+      event.preventDefault();
+      if (onSubmit) {
+        onSubmit(event);
+      }
+    },
+    [onSubmit]
+  );
 
   return (
     <Modal
@@ -46,7 +55,7 @@ export const DiscoverySourceSetupModal: React.FC<
         <Form
           noValidate={false}
           id="discovery-source-setup-form"
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
         >
           <FormGroup
             label="Name"

@@ -1,46 +1,43 @@
 ## @migration-planner-ui/agent-client@1.0.0-alpha
 
-This generator creates TypeScript/JavaScript client that utilizes [Fetch API](https://fetch.spec.whatwg.org/). The generated Node module can be used in the following environments:
+This package is a TypeScript/JavaScript client for the [Migration Planner - Agent API](https://github.com/kubev2v/migration-planner) that utilizes the [Fetch API](https://fetch.spec.whatwg.org/). It can be used in the following environments:
 
 Environment
 * Node.js
-* Webpack
-* Browserify
+* Modern browsers
 
 Language level
-* ES5 - you must have a Promises/A+ library installed
 * ES6
 
 Module system
-* CommonJS
 * ES6 module system
 
-It can be used in both TypeScript and JavaScript. In TypeScript, the definition will be automatically resolved via `package.json`. ([Reference](https://www.typescriptlang.org/docs/handbook/declaration-files/consumption.html))
+It can be used in both TypeScript and JavaScript. In TypeScript, the definitions will be automatically resolved via `package.json`. ([Reference](https://www.typescriptlang.org/docs/handbook/declaration-files/consumption.html))
 
 ### Building
 
-To build and compile the typescript sources to javascript use:
+To build and transpile the typescript sources to javascript use:
 ```
-npm install
-npm run build
+yarn install
+yarn build
 ```
 
 ### Publishing
 
-First build the package then run `npm publish`
+First build the package then run `yarn npm publish`
 
 ### Consuming
 
-navigate to the folder of your consuming project and run one of the following commands.
+Navigate to the folder of your consuming project and run one of the following commands.
 
 _published:_
 
 ```
-npm install @migration-planner-ui/agent-client@1.0.0-alpha --save
+yarn add @migration-planner-ui/agent-client@1.0.0-alpha
 ```
 
 _unPublished (not recommended):_
 
 ```
-npm install PATH_TO_GENERATED_PACKAGE --save
+yarn add PATH_TO_GENERATED_PACKAGE
 ```

@@ -4,9 +4,6 @@ import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
 import {
   Button,
   Icon,
-  Spinner,
-  Split,
-  SplitItem,
   TextContent,
   Text,
   Tooltip,
@@ -15,13 +12,14 @@ import { TrashIcon } from "@patternfly/react-icons";
 import { useAsyncFn } from "react-use";
 import { type AsyncStateRetry } from "react-use/lib/useAsyncRetry";
 import { type SourceApiInterface } from "@migration-planner-ui/api-client/apis";
-import { useInjection } from "#/ioc";
+import { useInjection } from "@migration-planner-ui/ioc";
 import { Symbols } from "#/main/Symbols";
-import { SourcesTableColumns } from "./SourcesTableColumns";
+import { ConfirmationModal } from "#/common/ConfirmationModal";
+import { Columns } from "./Columns";
 import { VALUE_NOT_AVAILABLE } from "./Constants";
 import { SourcesTableEmptyState } from "./EmptyState";
 import { DiscoverySourceSetupModal } from "./DiscoverySourceSetupModal";
-import { ConfirmationModal } from "./ConfirmationDialog";
+import { SourceStatusView } from "./SourceStatusView";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace SourcesTable {
@@ -59,30 +57,33 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
 
   const [downloadHandlerState, handleDownload] = useAsyncFn(
     async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      event.stopPropagation();
       const form = event.currentTarget;
       const name = form["discoverySourceName"].value;
-      
+
       const newSource = await sourceApi.createSource({
         sourceCreate: { name },
       });
-      
+
+      // TODO(jkilzi): Ask to replace the 'getSourceImage' with 'getSourceImageUrl'
+      // const image = await sourceApi.getSourceImage({ id: source.id });
+      // return image;
       const anchor = document.createElement("a");
       anchor.download = newSource.name + ".ova";
       anchor.href = `/planner/api/v1/sources/${newSource.id}/image`;
       document.body.appendChild(anchor);
       anchor.click();
       anchor.remove();
+
       toggleDiscoverySourceSetupModal();
-
       return newSource;
-
-      // TODO(jkilzi): Ask to replace the 'getSourceImage' with 'getSourceImageUrl'
-      // const image = await sourceApi.getSourceImage({ id: source.id });
-      // return image;
     }
   );
+
+  const handleEmptyStateDetectionError = useCallback(() => {
+    if (!sources.loading) {
+      sources.retry();
+    }
+  }, [sources]);
 
   let emptyStateVariant: "loading" | "error" | undefined;
   if (sources.loading) {
@@ -109,13 +110,13 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
       {hasSources && (
         <Thead>
           <Tr>
-            <Th>{SourcesTableColumns.Name}</Th>
-            <Th>{SourcesTableColumns.Status}</Th>
-            <Th>{SourcesTableColumns.Hosts}</Th>
-            <Th>{SourcesTableColumns.VMs}</Th>
-            <Th>{SourcesTableColumns.Networks}</Th>
-            <Th>{SourcesTableColumns.Datastores}</Th>
-            <Th>{SourcesTableColumns.Actions}</Th>
+            <Th>{Columns.Name}</Th>
+            <Th>{Columns.Status}</Th>
+            <Th>{Columns.Hosts}</Th>
+            <Th>{Columns.VMs}</Th>
+            <Th>{Columns.Networks}</Th>
+            <Th>{Columns.Datastores}</Th>
+            <Th>{Columns.Actions}</Th>
           </Tr>
         </Thead>
       )}
@@ -123,30 +124,32 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
         {hasSources ? (
           sources.value!.map((src) => (
             <Tr key={src.id}>
-              <Td dataLabel={SourcesTableColumns.Name}>{src.name}</Td>
-              <Td dataLabel={SourcesTableColumns.Status}>
-                <Split hasGutter>
-                  <SplitItem>
-                    <Spinner isInline />
-                  </SplitItem>
-                  <SplitItem>{src.status}</SplitItem>
-                </Split>
+              <Td dataLabel={Columns.Name}>{src.name}</Td>
+              <Td dataLabel={Columns.Status}>
+                <SourceStatusView
+                  status={src.status}
+                  statusInfo={
+                    src.statusInfo.length === 0
+                      ? "Something interesting about this status shows up here. 🪬🪬🪬" // TODO(jkilzi): Remove this after demo...
+                      : src.statusInfo
+                  }
+                />
               </Td>
-              <Td dataLabel={SourcesTableColumns.Hosts}>
+              <Td dataLabel={Columns.Hosts}>
                 {src.inventory?.infra.totalHosts || VALUE_NOT_AVAILABLE}
               </Td>
-              <Td dataLabel={SourcesTableColumns.VMs}>
+              <Td dataLabel={Columns.VMs}>
                 {src.inventory?.vms.total || VALUE_NOT_AVAILABLE}
               </Td>
-              <Td dataLabel={SourcesTableColumns.Networks}>
+              <Td dataLabel={Columns.Networks}>
                 {(src.inventory?.infra.networks ?? []).length ||
                   VALUE_NOT_AVAILABLE}
               </Td>
-              <Td dataLabel={SourcesTableColumns.Datastores}>
+              <Td dataLabel={Columns.Datastores}>
                 {(src.inventory?.infra.datastores ?? []).length ||
                   VALUE_NOT_AVAILABLE}
               </Td>
-              <Td dataLabel={SourcesTableColumns.Actions}>
+              <Td dataLabel={Columns.Actions}>
                 <Tooltip content="Remove">
                   <Button
                     data-source-id={src.id}
@@ -154,13 +157,15 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                     isDisabled={deleteSourceHandlerState.loading}
                     onClick={toggleConfirmationModal}
                   >
-                    <Icon size="md" isInline status="danger">
+                    <Icon size="md" isInline>
                       <TrashIcon />
                     </Icon>
                   </Button>
                 </Tooltip>
                 {shouldShowConfirmationModal && (
                   <ConfirmationModal
+                    titleIconVariant="warning"
+                    primaryButtonVariant="danger"
                     title="Remove discovery source?"
                     isOpen={shouldShowConfirmationModal}
                     onCancel={toggleConfirmationModal}
@@ -171,10 +176,7 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                     }}
                   >
                     <TextContent>
-                      <Text
-                        id="confirmation-modal-description"
-                        style={{ textAlign: "center" }}
-                      >
+                      <Text id="confirmation-modal-description">
                         The discovery information will be lost.
                       </Text>
                     </TextContent>
@@ -190,6 +192,7 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
                 variant={emptyStateVariant}
                 isCreateDiscoverySourceDisabled={downloadHandlerState.loading}
                 onCreateDiscoverySource={toggleDiscoverySourceSetupModal}
+                onDetectionError={handleEmptyStateDetectionError}
               />
 
               {shouldShowDiscoverySourceSetupModal && (

@@ -7,9 +7,16 @@
         {
             "type": "chrome",
             "request": "launch",
-            "name": "Launch Chrome",
-            "url": "http://127.0.0.1:5173",
+            "name": "Debug: Wizard",
+            "url": "http://127.0.0.1:3000",
             "webRoot": "${workspaceFolder}/apps/demo"
+        },
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Debug: Agent",
+            "url": "http://127.0.0.1:3001",
+            "webRoot": "${workspaceFolder}/apps/agent"
         }
     ]
 }

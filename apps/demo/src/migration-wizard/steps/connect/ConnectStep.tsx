@@ -69,7 +69,7 @@ export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
             actionLinks={
               <AlertActionLink
                 component="a"
-                href="http://127.0.0.1:5173/preview/vm"
+                href={sources.value![0].credentialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >

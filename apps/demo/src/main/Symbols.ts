@@ -1,6 +1,7 @@
 /** Symbols used by the DI container */
 export const Symbols = Object.freeze({
-  ImageApi: Symbol.for("ImageApi"),
-  SourceApi: Symbol.for("SourceApi"),
   AgentApi: Symbol.for("AgentApi"),
+  ImageApi: Symbol.for("ImageApi"),
+  MockSourceApi: Symbol.for("MockSourceApi"),
+  SourceApi: Symbol.for("SourceApi"),
 });

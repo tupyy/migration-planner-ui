@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 export const router = createBrowserRouter([
   {
     path: "/",
+    index: true,
     element: <Navigate to="/migrate" />,
   },
   {
@@ -30,8 +31,6 @@ export const router = createBrowserRouter([
       };
     },
   },
-
-  // These are not exposed in the App, are chunk-splitted and therefore lazy loaded
   {
     path: "/ocm",
     lazy: async () => {
@@ -45,19 +44,9 @@ export const router = createBrowserRouter([
     },
   },
   {
-    path: "/agent/login",
-    lazy: async () => {
-      const { default: AgentLoginPage } = await import("#/pages/AgentLoginPage");
-
-      return {
-        Component: AgentLoginPage,
-      };
-    },
-  },
-  {
     path: "/error/:code",
     lazy: async () => {
-      const { default: ErrorPage } = await import("#/pages/ErrorPage");
+      const { default: ErrorPage } = await import("#/common/ErrorPage");
 
       return {
         Component: ErrorPage,
@@ -67,7 +56,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     lazy: async () => {
-      const { default: ErrorPage } = await import("#/pages/ErrorPage");
+      const { default: ErrorPage } = await import("#/common/ErrorPage");
 
       return {
         element: (

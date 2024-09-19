@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "composite": true,
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "tsBuildInfoFile": "../../node_modules/.tmp/migration-wizard/tsconfig.app.tsbuildinfo",
     "target": "ES2020",
     "useDefineForClassFields": true,
     "emitDecoratorMetadata": true,
@@ -29,5 +29,8 @@
     }
   },
   "include": ["src"],
-  "references": [{ "path": "../../packages/api-client" }]
+  "references": [
+    { "path": "../../packages/api-client" },
+    { "path": "../../packages/agent-client" }
+  ]
 }
