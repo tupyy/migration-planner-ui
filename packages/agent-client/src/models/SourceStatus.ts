@@ -1,4 +1,4 @@
-export const enum SourceStatus {
+export enum SourceStatus {
   SourceStatusError = "error",
   SourceStatusGatheringInitialInventory = "gathering-initial-inventory",
   SourceStatusNotConnected = "not-connected",

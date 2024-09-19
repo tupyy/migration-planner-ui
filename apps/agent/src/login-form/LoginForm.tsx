@@ -2,7 +2,6 @@ import React from "react";
 import {
   Alert,
   AlertActionLink,
-  ActionGroup,
   Button,
   Card,
   CardBody,
@@ -19,8 +18,12 @@ import {
   Text,
   TextContent,
   TextInput,
+  Spinner,
+  SplitItem,
+  Split,
 } from "@patternfly/react-core";
 import { LoginFormViewModelInterface } from "./hooks/UseViewModel";
+import { FormStates } from "./FormStates";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace LoginForm {
@@ -42,7 +45,7 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
     >
       <CardHeader id="card-header-title">
         <TextContent>
-          <Text component="h2">Migration Planner</Text>
+          <Text component="h2">Migration Planner </Text>
           <Text>
             The Migration Planner requires access to your VMware environment to
             execute a comprehensive discovery process that gathers essential
@@ -148,6 +151,7 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               aria-label="Share aggregated data"
             />
           </FormGroup>
+          
           {vm.shouldDisplayAlert && (
             <FormGroup>
               <Alert
@@ -173,17 +177,30 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
           )}
         </Form>
       </CardBody>
+
       <CardFooter>
-        <ActionGroup>
-          <Button
-            type="submit"
-            variant="primary"
-            isDisabled={vm.shouldDisableFormControl}
-            form="login-form"
-          >
-            Login
-          </Button>
-        </ActionGroup>
+        <Split style={{ alignItems: "flex-end" }}>
+          <SplitItem>
+            <Button
+              type="submit"
+              variant="primary"
+              isDisabled={vm.shouldDisableFormControl}
+              form="login-form"
+            >
+              Login
+            </Button>
+          </SplitItem>
+          <SplitItem isFilled></SplitItem>
+          <SplitItem style={{ paddingRight: "2rem" }}>
+            {vm.formState === FormStates.CheckingStatus && (
+              <TextContent>
+                <Text component="p">
+                  <Spinner isInline /> Checking status...
+                </Text>
+              </TextContent>
+            )}
+          </SplitItem>
+        </Split>
       </CardFooter>
     </Card>
   );

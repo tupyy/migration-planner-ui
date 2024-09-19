@@ -128,11 +128,7 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
               <Td dataLabel={Columns.Status}>
                 <SourceStatusView
                   status={src.status}
-                  statusInfo={
-                    src.statusInfo.length === 0
-                      ? "Something interesting about this status shows up here. 🪬🪬🪬" // TODO(jkilzi): Remove this after demo...
-                      : src.statusInfo
-                  }
+                  statusInfo={src.statusInfo}
                 />
               </Td>
               <Td dataLabel={Columns.Hosts}>

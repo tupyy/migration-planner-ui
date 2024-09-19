@@ -1,7 +1,8 @@
 export const enum FormStates {
-  Initial = "initial",
+  CheckingStatus = "checkingStatus",
+  WaitingForCredentials = "waitingForCredentials",
   Submitting = "submitting",
-  Accepted = "accepted",
-  Rejected = "rejected",
+  CredentialsAccepted = "credentialsAccepted",
+  CredentialsRejected = "credentialsRejected",
   InvalidCredentials = "invalidCredentials",
 }

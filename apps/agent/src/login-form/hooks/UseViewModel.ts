@@ -1,8 +1,11 @@
 import { useState, useRef, useCallback, useMemo } from "react";
-import { useMount, useTitle } from "react-use";
+import { useAsync, useMount, useTitle } from "react-use";
 import { useNavigate } from "react-router-dom";
 import { AlertVariant } from "@patternfly/react-core";
-import type { Credentials } from "@migration-planner-ui/agent-client/models";
+import {
+  SourceStatus,
+  type Credentials,
+} from "@migration-planner-ui/agent-client/models";
 import type { AgentApiInterface } from "@migration-planner-ui/agent-client/apis";
 import { useInjection } from "@migration-planner-ui/ioc";
 import { newAbortSignal } from "#/common/AbortSignal";
@@ -36,10 +39,10 @@ const _computeFormControlVariant = (
   formState: FormStates
 ): FormControlValidatedStateVariant => {
   switch (formState) {
-    case FormStates.Accepted:
+    case FormStates.CredentialsAccepted:
       return "success";
     case FormStates.InvalidCredentials:
-    case FormStates.Rejected:
+    case FormStates.CredentialsRejected:
       return "error";
     default:
       return "default";
@@ -47,11 +50,13 @@ const _computeFormControlVariant = (
 };
 
 export const useViewModel = (): LoginFormViewModelInterface => {
-  useTitle("Virtualization Migration");
+  useTitle("Login");
   const navigateTo = useNavigate();
-  const [formState, setFormState] = useState<FormStates>(FormStates.Initial);
+  const [formState, setFormState] = useState<FormStates>(
+    FormStates.CheckingStatus
+  );
   const formRef = useRef<HTMLFormElement>();
-  const AgentApiClient = useInjection<AgentApiInterface>(Symbols.AgentApi);
+  const agentApi = useInjection<AgentApiInterface>(Symbols.AgentApi);
 
   useMount(() => {
     const form = formRef.current;
@@ -62,16 +67,32 @@ export const useViewModel = (): LoginFormViewModelInterface => {
     form["isDataSharingAllowed"].checked = DATA_SHARING_ALLOWED_DEFAULT_STATE;
   });
 
+  useAsync(async () => {
+    const res = await agentApi.getStatus();
+    switch (res.status) {
+      case SourceStatus.SourceStatusWaitingForCredentials:
+        setFormState(FormStates.WaitingForCredentials);
+        break;
+      case SourceStatus.SourceStatusGatheringInitialInventory:
+      case SourceStatus.SourceStatusUpToDate:
+        setFormState(FormStates.CredentialsAccepted);
+        break;
+
+      default:
+        break;
+    }
+  });
+
   return {
     formState,
     formRef,
     urlControlStateVariant: useMemo<FormControlValidatedStateVariant>(() => {
       switch (formState) {
-        case FormStates.Accepted:
+        case FormStates.CredentialsAccepted:
           return "success";
         case FormStates.InvalidCredentials:
           return "success";
-        case FormStates.Rejected:
+        case FormStates.CredentialsRejected:
           return "error";
         default:
           return "default";
@@ -80,31 +101,36 @@ export const useViewModel = (): LoginFormViewModelInterface => {
     usernameControlStateVariant: _computeFormControlVariant(formState),
     passwordControlStateVariant: _computeFormControlVariant(formState),
     shouldDisableFormControl: useMemo(
-      () => [FormStates.Submitting, FormStates.Accepted].includes(formState),
+      () =>
+        [
+          FormStates.CheckingStatus,
+          FormStates.Submitting,
+          FormStates.CredentialsAccepted,
+        ].includes(formState),
       [formState]
     ),
     alertVariant: useMemo(() => {
       switch (formState) {
-        case FormStates.Accepted:
+        case FormStates.CredentialsAccepted:
           return AlertVariant.success;
         case FormStates.InvalidCredentials:
-        case FormStates.Rejected:
+        case FormStates.CredentialsRejected:
           return AlertVariant.danger;
       }
     }, [formState]),
     alertTitle: useMemo(() => {
       switch (formState) {
-        case FormStates.Accepted:
+        case FormStates.CredentialsAccepted:
           return "Connected";
         case FormStates.InvalidCredentials:
           return "Invalid Credentials";
-        case FormStates.Rejected:
+        case FormStates.CredentialsRejected:
           return "Error";
       }
     }, [formState]),
     alertDescriptionList: useMemo(() => {
       switch (formState) {
-        case FormStates.Accepted:
+        case FormStates.CredentialsAccepted:
           return [
             {
               id: 1,
@@ -119,7 +145,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
               text: "Verify your account has not been temporarily locked for security reasons.",
             },
           ];
-        case FormStates.Rejected:
+        case FormStates.CredentialsRejected:
           return [
             {
               id: 1,
@@ -129,7 +155,12 @@ export const useViewModel = (): LoginFormViewModelInterface => {
       }
     }, [formState]),
     shouldDisplayAlert: useMemo(
-      () => ![FormStates.Initial, FormStates.Submitting].includes(formState),
+      () =>
+        ![
+          FormStates.CheckingStatus,
+          FormStates.WaitingForCredentials,
+          FormStates.Submitting,
+        ].includes(formState),
       [formState]
     ),
     handleSubmit: useCallback<React.FormEventHandler<HTMLFormElement>>(
@@ -157,7 +188,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           REQUEST_TIMEOUT_SECONDS,
           "The server didn't respond in a timely fashion."
         );
-        const [statusCodeOK, error] = await AgentApiClient.putCredentials(
+        const [statusCodeOK, error] = await agentApi.putCredentials(
           credentials,
           {
             signal,
@@ -167,16 +198,16 @@ export const useViewModel = (): LoginFormViewModelInterface => {
         const status = statusCodeOK ?? error.code;
         switch (status) {
           case 204:
-            setFormState(FormStates.Accepted);
+            setFormState(FormStates.CredentialsAccepted);
             break;
           case 400:
-            setFormState(FormStates.Rejected);
+            setFormState(FormStates.CredentialsRejected);
             break;
           case 401:
             setFormState(FormStates.InvalidCredentials);
             break;
           case 422:
-            setFormState(FormStates.Rejected);
+            setFormState(FormStates.CredentialsRejected);
             break;
           default:
             navigateTo(`/error/${error!.code}`, {
@@ -185,7 +216,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
             break;
         }
       },
-      [AgentApiClient, navigateTo]
+      [agentApi, navigateTo]
     ),
   };
 };
