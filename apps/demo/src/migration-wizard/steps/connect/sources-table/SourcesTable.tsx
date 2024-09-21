@@ -102,8 +102,7 @@ export const SourcesTable: React.FC<SourcesTable.Props> = (props) => {
     }
 
     sources.retry();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [downloadHandlerState, deleteSourceHandlerState]);
+  }, [deleteSourceHandlerState.loading, downloadHandlerState.loading, sources]);
 
   return (
     <Table aria-label="Sources table" variant="compact" borders={false}>

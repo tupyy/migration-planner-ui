@@ -26,3 +26,4 @@ src/apis/index.ts
 package.json
 tsconfig.esm.json
 tsconfig.json
+.gitignore

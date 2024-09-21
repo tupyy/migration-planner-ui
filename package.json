@@ -2,8 +2,33 @@
   "name": "migration-planner-ui",
   "private": true,
   "packageManager": "yarn@4.4.1",
+  "type": "module",
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "all:build": "yarn workspaces foreach -t --all run build",
+    "all:clean": "yarn workspaces foreach --all -p run clean",
+    "all:lint": "yarn workspaces foreach --all -p run lint",
+    "api-client:update": "yarn run -T openapi-generator-cli generate"
+  },
+  "devDependencies": {
+    "@eslint/js": "^8.57.0",
+    "@openapitools/openapi-generator-cli": "^2.13.5",
+    "@types/eslint__js": "^8.42.3",
+    "@types/lodash": "^4",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react-swc": "^3.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.36.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.12",
+    "globals": "^15.9.0",
+    "typescript": "~5.5.0",
+    "typescript-eslint": "^8.6.0",
+    "vite": "^5.4.7",
+    "vite-tsconfig-paths": "^5.0.1"
+  }
 }

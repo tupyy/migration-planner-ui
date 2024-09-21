@@ -5,18 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Agent",
             "type": "chrome",
             "request": "launch",
-            "name": "Debug: Wizard",
-            "url": "http://127.0.0.1:3000",
-            "webRoot": "${workspaceFolder}/apps/demo"
-        },
-        {
-            "type": "chrome",
-            "request": "launch",
-            "name": "Debug: Agent",
             "url": "http://127.0.0.1:3001",
             "webRoot": "${workspaceFolder}/apps/agent"
+        },
+        {
+            "name": "Demo",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://127.0.0.1:3000",
+            "webRoot": "${workspaceFolder}/apps/demo"
         }
     ]
 }

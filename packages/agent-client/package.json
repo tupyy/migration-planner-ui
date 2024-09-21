@@ -32,12 +32,9 @@
   },
   "sideEffects": false,
   "scripts": {
-    "build": "tsc -b",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build": "yarn run -T tsc -b",
+    "bundle": "yarn build && yarn pack --out dist/%s-%v.tgz",
     "clean": "rm -rf node_modules dist",
-    "prepare": "npm run build"
-  },
-  "devDependencies": {
-    "typescript": "^5.6.2"
+    "lint": "yarn run -T eslint . --report-unused-disable-directives --max-warnings 0"
   }
 }
