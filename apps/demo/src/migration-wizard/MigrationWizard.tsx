@@ -1,22 +1,15 @@
 import React from "react";
-import { useAsyncRetry } from "react-use";
 import { Wizard, WizardStep } from "@patternfly/react-core";
-import { SourceApiInterface } from "@migration-planner-ui/api-client/apis";
-import { ConnectStep } from "#/migration-wizard/steps/connect/ConnectStep";
-import { DiscoveryStep } from "#/migration-wizard/steps/discovery/DiscoveryStep";
-import { useComputedHeightFromPageHeader } from "#/migration-wizard/hooks/UseComputedHeightFromPageHeader";
-import { useInjection } from "@migration-planner-ui/ioc";
-import { Symbols } from "#/main/Symbols";
+import { ConnectStep } from "./steps/connect/ConnectStep";
+import { DiscoveryStep } from "./steps/discovery/DiscoveryStep";
+import { useComputedHeightFromPageHeader } from "./hooks/UseComputedHeightFromPageHeader";
+import { useDiscoverySources } from "./hooks/UseDiscoverySources";
 
 export const MigrationWizard: React.FC = () => {
   const computedHeight = useComputedHeightFromPageHeader();
-  const sourceApi = useInjection<SourceApiInterface>(Symbols.SourceApi);
-  const state = useAsyncRetry(async () => {
-    const sources = await sourceApi.listSources();
-    return sources;
-  }, []);
-  const hasSources = (state.value ?? []).length > 0;
-  const discoverySourceIsUpToDate = state.value?.[0]?.status === "up-to-date";
+  const discoverSourcesContext = useDiscoverySources();
+  const [firstSource, ..._otherSources] = discoverSourcesContext.sources;
+  const isDiscoverySourceUpToDate = firstSource?.status === "up-to-date";
 
   return (
     <Wizard height={computedHeight}>
@@ -25,20 +18,20 @@ export const MigrationWizard: React.FC = () => {
         id="connect-step"
         footer={{
           isCancelHidden: true,
-          isNextDisabled: !hasSources || !discoverySourceIsUpToDate,
+          isNextDisabled: !isDiscoverySourceUpToDate,
         }}
       >
-        <ConnectStep sources={state} />
+        <ConnectStep />
       </WizardStep>
       <WizardStep
         name="Discover"
-        id="discovery-step"
+        id="discover-step"
         footer={{ isCancelHidden: true }}
       >
         <DiscoveryStep />
       </WizardStep>
       <WizardStep name="Plan" id="plan-step" footer={{ isCancelHidden: true }}>
-        <DiscoveryStep />
+        <div>Plan step</div>
       </WizardStep>
     </Wizard>
   );

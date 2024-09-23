@@ -533,7 +533,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@migration-planner-ui/api-client@workspace:packages/api-client":
+"@migration-planner-ui/api-client@workspace:^, @migration-planner-ui/api-client@workspace:packages/api-client":
   version: 0.0.0-use.local
   resolution: "@migration-planner-ui/api-client@workspace:packages/api-client"
   languageName: unknown
@@ -2286,6 +2286,7 @@ __metadata:
   dependencies:
     "@emotion/css": "npm:^11.13.0"
     "@migration-planner-ui/agent-client": "workspace:^"
+    "@migration-planner-ui/api-client": "workspace:^"
     "@migration-planner-ui/ioc": "workspace:^"
     "@patternfly/react-core": "npm:^5.4.0"
     "@patternfly/react-icons": "npm:^5.4.0"

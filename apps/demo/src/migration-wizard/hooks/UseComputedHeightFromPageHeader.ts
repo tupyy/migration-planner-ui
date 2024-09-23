@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useWindowSize } from "react-use";
-import { DEFAULT_HEIGHT } from "../Constants";
+import { DEFAULT_HEIGHT } from "#/migration-wizard/Constants";
 
 function getMainPageSectionVerticalPadding(pageMainSection: Element): number {
   const { paddingTop, paddingBottom } = getComputedStyle(pageMainSection);

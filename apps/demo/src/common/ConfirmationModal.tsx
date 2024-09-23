@@ -1,3 +1,4 @@
+import React from "react";
 import { Button } from "@patternfly/react-core";
 import {
   Modal,
@@ -5,47 +6,28 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@patternfly/react-core/next";
-import React from "react";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace ConfirmationModal {
-  export type Props =
-    | {
-        onClose?: (event: KeyboardEvent | React.MouseEvent) => void;
-        onCancel: React.MouseEventHandler<HTMLButtonElement> | undefined;
-        onConfirm?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-        isOpen?: boolean;
-        titleIconVariant?: "warning" | "success" | "danger" | "info" | "custom";
-        variant?: "default" | "small" | "medium" | "large";
-        primaryButtonVariant?:
-          | "warning"
-          | "danger"
-          | "link"
-          | "primary"
-          | "secondary"
-          | "tertiary"
-          | "plain"
-          | "control";
-        title: string;
-      }
-    | {
-        onClose: (event: KeyboardEvent | React.MouseEvent) => void;
-        onCancel?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-        onConfirm?: React.MouseEventHandler<HTMLButtonElement> | undefined;
-        isOpen?: boolean;
-        titleIconVariant?: "warning" | "success" | "danger" | "info" | "custom";
-        variant?: "default" | "small" | "medium" | "large";
-        primaryButtonVariant?:
-          | "warning"
-          | "danger"
-          | "link"
-          | "primary"
-          | "secondary"
-          | "tertiary"
-          | "plain"
-          | "control";
-        title: string;
-      };
+  export type Props = {
+    onClose?: (event: KeyboardEvent | React.MouseEvent) => void;
+    onCancel?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+    onConfirm?: React.MouseEventHandler<HTMLButtonElement> | undefined;
+    isOpen?: boolean;
+    isDisabled?: boolean;
+    titleIconVariant?: "warning" | "success" | "danger" | "info" | "custom";
+    variant?: "default" | "small" | "medium" | "large";
+    primaryButtonVariant?:
+      | "warning"
+      | "danger"
+      | "link"
+      | "primary"
+      | "secondary"
+      | "tertiary"
+      | "plain"
+      | "control";
+    title: string;
+  };
 }
 
 export const ConfirmationModal: React.FC<
@@ -53,6 +35,7 @@ export const ConfirmationModal: React.FC<
 > = (props) => {
   const {
     isOpen = false,
+    isDisabled = false,
     onClose,
     onConfirm,
     onCancel,
@@ -82,13 +65,16 @@ export const ConfirmationModal: React.FC<
         <Button
           key="confirm"
           variant={primaryButtonVariant}
+          isDisabled={isDisabled}
           onClick={onConfirm}
         >
           Confirm
         </Button>
-        <Button key="cancel" variant="link" onClick={onCancel}>
-          Cancel
-        </Button>
+        {onCancel && (
+          <Button key="cancel" variant="link" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
       </ModalFooter>
     </Modal>
   );

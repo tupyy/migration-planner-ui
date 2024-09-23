@@ -28,7 +28,8 @@
         "esbenp.prettier-vscode",
         "Orta.vscode-jest",
         "rangav.vscode-thunder-client",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "EditorConfig.EditorConfig"
       ],
       "settings": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

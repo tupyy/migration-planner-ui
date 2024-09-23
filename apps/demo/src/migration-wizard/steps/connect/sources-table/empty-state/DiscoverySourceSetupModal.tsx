@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Button,
   Form,
@@ -19,6 +19,7 @@ import {
 export namespace DiscoverySourceSetupModal {
   export type Props = {
     isOpen?: boolean;
+    isDisabled?: boolean;
     onClose?: ((event: KeyboardEvent | React.MouseEvent) => void) | undefined;
     onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
   };
@@ -27,7 +28,8 @@ export namespace DiscoverySourceSetupModal {
 export const DiscoverySourceSetupModal: React.FC<
   DiscoverySourceSetupModal.Props
 > = (props) => {
-  const { isOpen = false, onClose, onSubmit } = props;
+  const { isOpen = false, isDisabled = false, onClose, onSubmit } = props;
+
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
       event.preventDefault();
@@ -90,6 +92,7 @@ export const DiscoverySourceSetupModal: React.FC<
           type="submit"
           key="confirm"
           variant="primary"
+          isDisabled={isDisabled}
         >
           Download
         </Button>

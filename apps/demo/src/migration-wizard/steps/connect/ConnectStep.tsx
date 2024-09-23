@@ -15,42 +15,12 @@ import {
   AlertActionLink,
 } from "@patternfly/react-core";
 import { ClusterIcon } from "@patternfly/react-icons";
-import { type Source } from "@migration-planner-ui/api-client/models";
-import { type AsyncStateRetry } from "react-use/lib/useAsyncRetry";
-import { SourcesTable } from "./sources-table/SourcesTable";
+import { useDiscoverySources } from "#/migration-wizard/hooks/UseDiscoverySources";
+import { SourcesTable } from "#/migration-wizard/steps/connect/sources-table/SourcesTable";
 
-const InstructionsList: React.FC = () => (
-  <TextContent style={{ paddingBlock: "1rem" }}>
-    <Text component="h4">
-      Follow these steps to connect your environment and start the discovery
-      process
-    </Text>
-    <List
-      component="ol"
-      type={OrderType.number}
-      style={{ marginInlineStart: 0 }}
-    >
-      <ListItem>
-        A link will appear below once the VM is running. Use this link to enter
-        credentials and connect your environment.
-      </ListItem>
-      <ListItem>
-        When the connection is established, you will be able to proceed and see
-        the discovery report.
-      </ListItem>
-    </List>
-  </TextContent>
-);
-
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace ConnectStep {
-  export type Props = {
-    sources: Readonly<AsyncStateRetry<Source[]>>;
-  };
-}
-
-export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
-  const { sources } = props;
+export const ConnectStep: React.FC = () => {
+  const discoverySourcesContext = useDiscoverySources();
+  const [firstSource, ..._otherSources] = discoverySourcesContext.sources;
 
   return (
     <Stack hasGutter>
@@ -60,8 +30,27 @@ export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
         </TextContent>
       </StackItem>
       <StackItem>
-        <InstructionsList />
-        {sources.value?.[0]?.credentialUrl && (
+        <TextContent style={{ paddingBlock: "1rem" }}>
+          <Text component="h4">
+            Follow these steps to connect your environment and start the
+            discovery process
+          </Text>
+          <List
+            component="ol"
+            type={OrderType.number}
+            style={{ marginInlineStart: 0 }}
+          >
+            <ListItem>
+              A link will appear below once the VM is running. Use this link to
+              enter credentials and connect your environment.
+            </ListItem>
+            <ListItem>
+              When the connection is established, you will be able to proceed
+              and see the discovery report.
+            </ListItem>
+          </List>
+        </TextContent>
+        {firstSource?.credentialUrl && (
           <Alert
             isInline
             variant="custom"
@@ -69,11 +58,11 @@ export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
             actionLinks={
               <AlertActionLink
                 component="a"
-                href={sources.value![0].credentialUrl}
+                href={firstSource.credentialUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {sources.value![0].credentialUrl}
+                {firstSource.credentialUrl}
               </AlertActionLink>
             }
           >
@@ -99,7 +88,7 @@ export const ConnectStep: React.FC<ConnectStep.Props> = (props) => {
                 </Text>
               </TextContent>
             </PanelHeader>
-            <SourcesTable sources={sources} />
+            <SourcesTable />
           </PanelMain>
         </Panel>
       </StackItem>

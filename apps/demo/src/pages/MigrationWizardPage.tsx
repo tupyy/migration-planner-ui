@@ -1,6 +1,7 @@
 import React from "react";
 import { AppPage } from "#/common/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
+import { DiscoverySourcesProvider } from "#/migration-wizard/providers/DiscoverySources";
 
 const MigrationWizardPage: React.FC = () => {
   return (
@@ -11,7 +12,9 @@ const MigrationWizardPage: React.FC = () => {
       ]}
       title="Welcome, let's start your migration journey from VMware to OpenShift."
     >
-      <MigrationWizard />
+      <DiscoverySourcesProvider>
+        <MigrationWizard />
+      </DiscoverySourcesProvider>
     </AppPage>
   );
 };
