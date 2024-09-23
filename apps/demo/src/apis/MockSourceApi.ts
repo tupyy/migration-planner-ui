@@ -14,7 +14,9 @@ import {
 } from "@migration-planner-ui/api-client/runtime";
 
 export class MockSourceApi implements SourceApiInterface {
-  constructor(_configuration: ConfigurationParameters) {}
+  constructor(_configuration: ConfigurationParameters) {
+    console.warn("#### CAUTION: Using MockSourceApi ####")
+  }
 
   async createSourceRaw(
     _requestParameters: CreateSourceRequest,

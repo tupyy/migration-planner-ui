@@ -1,20 +1,37 @@
-import React from "react";
-import { useMount } from "react-use";
+import React, { useEffect } from "react";
+import { useMount, useUnmount } from "react-use";
 import { Table, Thead, Tr, Th, Tbody, Td } from "@patternfly/react-table";
-import { useDiscoverySources } from "#/migration-wizard/hooks/UseDiscoverySources";
 import { EmptyState } from "./empty-state/EmptyState";
 import { RemoveSourceAction } from "./actions/RemoveSourceAction";
 import { Columns } from "./Columns";
-import { VALUE_NOT_AVAILABLE } from "./Constants";
+import { DEFAULT_POLLING_DELAY, VALUE_NOT_AVAILABLE } from "./Constants";
 import { SourceStatusView } from "./SourceStatusView";
+import { useDiscoverySources } from "#/migration-wizard/contexts/discovery-sources/Context";
 
 export const SourcesTable: React.FC = () => {
   const discoverySourcesContext = useDiscoverySources();
   const hasSources = discoverySourcesContext.sources.length > 0;
+  const [firstSource, ..._otherSources] = discoverySourcesContext.sources;
 
   useMount(() => {
-    discoverySourcesContext.listSources();
+    if (!discoverySourcesContext.isPolling) {
+      discoverySourcesContext.listSources();
+    }
   });
+
+  useUnmount(() => {
+    discoverySourcesContext.stopPolling();
+  });
+
+  useEffect(() => {
+    if (["error", "up-to-date"].includes(firstSource?.status)) {
+      discoverySourcesContext.stopPolling();
+      return;
+    } else {
+      discoverySourcesContext.startPolling(DEFAULT_POLLING_DELAY);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firstSource?.status]);
 
   return (
     <Table aria-label="Sources table" variant="compact" borders={false}>

@@ -3,7 +3,7 @@ import { Wizard, WizardStep } from "@patternfly/react-core";
 import { ConnectStep } from "./steps/connect/ConnectStep";
 import { DiscoveryStep } from "./steps/discovery/DiscoveryStep";
 import { useComputedHeightFromPageHeader } from "./hooks/UseComputedHeightFromPageHeader";
-import { useDiscoverySources } from "./hooks/UseDiscoverySources";
+import { useDiscoverySources } from "./contexts/discovery-sources/Context";
 
 export const MigrationWizard: React.FC = () => {
   const computedHeight = useComputedHeightFromPageHeader();

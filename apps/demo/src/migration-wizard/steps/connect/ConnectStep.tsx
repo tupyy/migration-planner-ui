@@ -15,8 +15,8 @@ import {
   AlertActionLink,
 } from "@patternfly/react-core";
 import { ClusterIcon } from "@patternfly/react-icons";
-import { useDiscoverySources } from "#/migration-wizard/hooks/UseDiscoverySources";
 import { SourcesTable } from "#/migration-wizard/steps/connect/sources-table/SourcesTable";
+import { useDiscoverySources } from "#/migration-wizard/contexts/discovery-sources/Context";
 
 export const ConnectStep: React.FC = () => {
   const discoverySourcesContext = useDiscoverySources();
@@ -50,7 +50,7 @@ export const ConnectStep: React.FC = () => {
             </ListItem>
           </List>
         </TextContent>
-        {firstSource?.credentialUrl && (
+        {firstSource?.status === "waiting-for-credentials" && (
           <Alert
             isInline
             variant="custom"

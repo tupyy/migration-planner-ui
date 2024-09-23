@@ -1,7 +1,7 @@
 import React from "react";
 import { AppPage } from "#/common/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
-import { DiscoverySourcesProvider } from "#/migration-wizard/providers/DiscoverySources";
+import { Provider as DiscoverySourcesProvider } from "#/migration-wizard/contexts/discovery-sources/Provider";
 
 const MigrationWizardPage: React.FC = () => {
   return (

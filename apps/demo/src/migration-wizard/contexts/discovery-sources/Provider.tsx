@@ -1,36 +1,17 @@
-import React, { type PropsWithChildren } from "react";
-import { useAsyncFn } from "react-use";
-import { type Source } from "@migration-planner-ui/api-client/models";
+import React, {
+  useCallback,
+  useState,
+  type PropsWithChildren,
+} from "react";
+import { useAsyncFn, useInterval } from "react-use";
 import { type SourceApiInterface } from "@migration-planner-ui/api-client/apis";
 import { useInjection } from "@migration-planner-ui/ioc";
 import { Symbols } from "#/main/Symbols";
+import { Context } from "./Context";
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace DiscoverySources {
-  export type Context = {
-    sources: Source[];
-    isLoadingSources: boolean;
-    errorLoadingSources?: Error;
-    isDeletingSource: boolean;
-    errorDeletingSource?: Error;
-    isCreatingSource: boolean;
-    errorCreatingSource?: Error;
-    isDownloadingSource: boolean;
-    errorDownloadingSource?: Error;
-    listSources: () => Promise<Source[]>;
-    deleteSource: (id: string) => Promise<Source>;
-    createSource: (name: string) => Promise<Source>;
-    downloadSource: (sourceName: string) => Promise<void>;
-  };
-}
-
-export const DiscoverySourcesContext =
-  React.createContext<DiscoverySources.Context | null>(null);
-
-export const DiscoverySourcesProvider: React.FC<PropsWithChildren> = (
-  props
-) => {
+export const Provider: React.FC<PropsWithChildren> = (props) => {
   const { children } = props;
+
   const sourceApi = useInjection<SourceApiInterface>(Symbols.SourceApi);
 
   const [listSourcesState, listSources] = useAsyncFn(async () => {
@@ -54,10 +35,12 @@ export const DiscoverySourcesProvider: React.FC<PropsWithChildren> = (
     async (sourceName: string): Promise<void> => {
       const anchor = document.createElement("a");
       anchor.download = sourceName + ".ova";
+
       const newSource = await createSource(sourceName);
-      // TODO(jkilzi): Extract to a sevice that builds the URL (the '/planner/' prefix needs to be removed in prod)
-      // const image = await sourceApi.getSourceImage({ id: newSource.id });
-      // anchor.href = URL.createObjectURL(image);
+      // TODO(jkilzi): See: ECOPROJECT-2192. 
+      // Then don't forget to  remove the '/planner/' prefix in production.
+      // const image = await sourceApi.getSourceImage({ id: newSource.id }); // This API is useless in production
+      // anchor.href = URL.createObjectURL(image); // Don't do this...
       anchor.href = `/planner/api/v1/sources/${newSource.id}/image`;
 
       document.body.appendChild(anchor);
@@ -66,7 +49,28 @@ export const DiscoverySourcesProvider: React.FC<PropsWithChildren> = (
     }
   );
 
-  const ctx: Readonly<DiscoverySources.Context> = {
+  const [isPolling, setIsPolling] = useState(false);
+  const [pollingDelay, setPollingDelay] = useState<number | null>(null);
+  const startPolling = useCallback(
+    (delay: number) => {
+      if (!isPolling) {
+        setPollingDelay(delay);
+        setIsPolling(true);
+      }
+    },
+    [isPolling]
+  );
+  const stopPolling = useCallback(() => {
+    if (isPolling) {
+      setPollingDelay(null);
+      setIsPolling(false);
+    }
+  }, [isPolling]);
+  useInterval(() => {
+    listSources();
+  }, pollingDelay);
+
+  const ctx: DiscoverySources.Context = {
     sources: listSourcesState.value ?? [],
     isLoadingSources: listSourcesState.loading,
     errorLoadingSources: listSourcesState.error,
@@ -76,17 +80,16 @@ export const DiscoverySourcesProvider: React.FC<PropsWithChildren> = (
     errorCreatingSource: createSourceState.error,
     isDownloadingSource: downloadSourceState.loading,
     errorDownloadingSource: downloadSourceState.error,
+    isPolling,
     listSources,
     deleteSource,
     createSource,
     downloadSource,
+    startPolling,
+    stopPolling,
   };
 
-  return (
-    <DiscoverySourcesContext.Provider value={Object.freeze(ctx)}>
-      {children}
-    </DiscoverySourcesContext.Provider>
-  );
+  return <Context.Provider value={ctx}>{children}</Context.Provider>;
 };
 
-DiscoverySourcesProvider.displayName = "DiscoverySourcesProvider";
+Provider.displayName = "DiscoverySourcesProvider";
