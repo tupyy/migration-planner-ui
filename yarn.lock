@@ -1271,6 +1271,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/humanize-plus@npm:^1":
+  version: 1.8.2
+  resolution: "@types/humanize-plus@npm:1.8.2"
+  checksum: 10c0/aced9afc59200b875bcf340a300e16e58a67bf6e9e7d5088d6e19b07e9672085405400000142bab8c0a2d1e3b141caf6a1ae0071a6bc3d96d9ab53dfcc1a8973
+  languageName: node
+  linkType: hard
+
 "@types/js-cookie@npm:^2.2.6":
   version: 2.2.7
   resolution: "@types/js-cookie@npm:2.2.7"
@@ -2292,6 +2299,8 @@ __metadata:
     "@patternfly/react-icons": "npm:^5.4.0"
     "@patternfly/react-table": "npm:^5.4.0"
     "@redhat-cloud-services/frontend-components": "npm:^4.2.13"
+    "@types/humanize-plus": "npm:^1"
+    humanize-plus: "npm:^1.8.2"
     lodash: "npm:^4.17.21"
     prop-types: "npm:^15.8.1"
     react: "npm:^18.3.1"
@@ -3369,6 +3378,13 @@ __metadata:
     agent-base: "npm:^7.0.2"
     debug: "npm:4"
   checksum: 10c0/2490e3acec397abeb88807db52cac59102d5ed758feee6df6112ab3ccd8325e8a1ce8bce6f4b66e5470eca102d31e425ace904242e4fa28dbe0c59c4bafa7b2c
+  languageName: node
+  linkType: hard
+
+"humanize-plus@npm:^1.8.2":
+  version: 1.8.2
+  resolution: "humanize-plus@npm:1.8.2"
+  checksum: 10c0/d9cfa8d8edef1bbb4a18cdb6ad8ba1507971d346ce4ec3fe99efc46bd3715541e45f32ddc14724c042e2e4d3120c09212a7ed58a8d99d6a0de530777645a22ed
   languageName: node
   linkType: hard
 
