@@ -10,13 +10,15 @@ import { Container, Provider as DependencyInjectionProvider } from "@migration-p
 import { PLANNER_BASEPATH } from "./Constants";
 import { router } from "./Router";
 import { Symbols } from "./Symbols";
+import { MockSourceApi } from "#/apis/MockSourceApi"; // TODO(jkilzi): REMOVE!!!
 
 function getConfiguredContainer(): Container {
   const plannerApiConfig = new Configuration({
     basePath: PLANNER_BASEPATH,
   });
   const container = new Container();
-  container.register(Symbols.SourceApi, new SourceApi(plannerApiConfig));
+  // container.register(Symbols.SourceApi, new SourceApi(plannerApiConfig));
+  container.register(Symbols.SourceApi, new MockSourceApi(plannerApiConfig));
 
   return container;
 }

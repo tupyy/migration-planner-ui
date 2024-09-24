@@ -15,7 +15,7 @@ import {
 
 export class MockSourceApi implements SourceApiInterface {
   constructor(_configuration: ConfigurationParameters) {
-    console.warn("#### CAUTION: Using MockSourceApi ####")
+    console.warn("#### CAUTION: Using MockSourceApi ####");
   }
 
   async createSourceRaw(
@@ -72,11 +72,8 @@ export class MockSourceApi implements SourceApiInterface {
   async listSources(
     _initOverrides?: RequestInit | InitOverrideFunction
   ): Promise<Array<Source>> {
-    await sleep(10 * Time.Second);
-    const { default: json } = await import(
-      "./responses/wating-for-credentials.json"
-      // "./responses/up-to-date.json"
-    );
+    // await sleep(10 * Time.Second);
+    const { default: json } = await import("./responses/up-to-date.json");
     return json as unknown as Array<Source>;
   }
   async readSourceRaw(
