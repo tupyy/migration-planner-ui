@@ -16,6 +16,7 @@
     "@migration-planner-ui/agent-client": "workspace:^",
     "@migration-planner-ui/api-client": "workspace:^",
     "@migration-planner-ui/ioc": "workspace:^",
+    "@patternfly/react-charts": "7.4.1",
     "@patternfly/react-core": "^5.4.0",
     "@patternfly/react-icons": "^5.4.0",
     "@patternfly/react-table": "^5.4.0",

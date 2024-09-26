@@ -15,7 +15,6 @@ import {
 import {
   CogsIcon,
   DatabaseIcon,
-  DataProcessorIcon,
   ExclamationCircleIcon,
   ExclamationTriangleIcon,
   HddIcon,
@@ -51,7 +50,8 @@ type ChartBarDataEntry = {
 
 function histogramToBarChartData(
   histogram: Histogram,
-  name: string
+  name: string,
+  units: string = ""
 ): ChartBarDataEntry[] {
   const { minValue, step, data } = histogram;
   return data.map((y, idx) => {
@@ -60,7 +60,7 @@ function histogramToBarChartData(
 
     return {
       name,
-      x: `${lo}-${hi}`,
+      x: `${lo}-${hi}${units}`,
       y,
     };
   });
@@ -84,10 +84,10 @@ export const DiscoveryStep: React.FC = () => {
     vlans,
   } = infra;
   const { cpuCores, ramGB, diskCount, diskGB, os } = vms;
+  const operatingSystems = Object.entries(os);
   const totalDistributedSwitches = networks.filter(
     (net) => net.type === "distributed"
   ).length;
-  const operatingSystems = Object.entries(os);
 
   const infrastructureViewData: TreeViewDataItem = {
     title: "Infrastructure",
@@ -123,12 +123,13 @@ export const DiscoveryStep: React.FC = () => {
             ariaTitle="CPU cores distribution"
             containerComponent={
               <ChartVoronoiContainer
+                responsive
                 labels={({ datum }) => `${datum.name}: ${datum.y}`}
                 constrainToVisibleArea
               />
             }
             domain={{
-              y: [0, getMax(vms.cpuCores.histogram)],
+              y: [0, getMax(cpuCores.histogram)],
             }}
             domainPadding={{ x: [10, 10] }}
             legendOrientation="horizontal"
@@ -141,7 +142,7 @@ export const DiscoveryStep: React.FC = () => {
             <ChartAxis dependentAxis showGrid />
             <ChartGroup>
               <ChartBar
-                data={histogramToBarChartData(vms.cpuCores.histogram, "Cores")}
+                data={histogramToBarChartData(cpuCores.histogram, "Count")}
               />
             </ChartGroup>
           </Chart>
@@ -156,14 +157,13 @@ export const DiscoveryStep: React.FC = () => {
             ariaTitle="Memory distribution"
             containerComponent={
               <ChartVoronoiContainer
+                responsive
                 labels={({ datum }) => `${datum.name}: ${datum.y}`}
                 constrainToVisibleArea
               />
             }
-            domain={{ y: [0, getMax(vms.ramGB.histogram)] }}
+            domain={{ y: [0, getMax(ramGB.histogram)] }}
             domainPadding={{ x: [10, 10] }}
-            legendOrientation="horizontal"
-            legendPosition="bottom-left"
             padding={50}
             width={400}
             height={250}
@@ -172,7 +172,7 @@ export const DiscoveryStep: React.FC = () => {
             <ChartAxis dependentAxis showGrid />
             <ChartGroup>
               <ChartBar
-                data={histogramToBarChartData(vms.ramGB.histogram, "RAM")}
+                data={histogramToBarChartData(ramGB.histogram, "Count")}
               />
             </ChartGroup>
           </Chart>
@@ -211,18 +211,19 @@ export const DiscoveryStep: React.FC = () => {
                 ariaTitle="Disk capacity distribution in GB"
                 containerComponent={
                   <ChartVoronoiContainer
+                    responsive
                     labels={({ datum }) => `${datum.name}: ${datum.y}`}
                     constrainToVisibleArea
                   />
                 }
                 domain={{
-                  y: [0, getMax(vms.diskGB.histogram)],
+                  y: [0, getMax(diskGB.histogram)],
                 }}
                 domainPadding={{ x: [10, 10] }}
                 legendOrientation="horizontal"
                 legendPosition="bottom-left"
-                padding={50}
-                width={400}
+                padding={75}
+                width={600}
                 height={250}
               >
                 <ChartAxis />
@@ -231,7 +232,7 @@ export const DiscoveryStep: React.FC = () => {
                   <ChartBar
                     data={histogramToBarChartData(
                       vms.diskGB.histogram,
-                      "Capacity in GB"
+                      "Count"
                     )}
                   />
                 </ChartGroup>
@@ -247,26 +248,24 @@ export const DiscoveryStep: React.FC = () => {
                 ariaTitle="Disk count distribution"
                 containerComponent={
                   <ChartVoronoiContainer
+                    responsive
                     labels={({ datum }) => `${datum.name}: ${datum.y}`}
                     constrainToVisibleArea
                   />
                 }
-                domain={{ y: [0, getMax(vms.diskCount.histogram)] }}
+                domain={{ y: [0, getMax(diskCount.histogram)] }}
                 domainPadding={{ x: [10, 10] }}
                 legendOrientation="horizontal"
                 legendPosition="bottom-left"
-                padding={50}
-                width={400}
+                padding={75}
+                width={600}
                 height={250}
               >
                 <ChartAxis />
                 <ChartAxis dependentAxis showGrid />
                 <ChartGroup>
                   <ChartBar
-                    data={histogramToBarChartData(
-                      vms.diskCount.histogram,
-                      "Count"
-                    )}
+                    data={histogramToBarChartData(diskCount.histogram, "Count")}
                   />
                 </ChartGroup>
               </Chart>
