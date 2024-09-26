@@ -1,4 +1,4 @@
-import { sleep, Time } from "#/common/Time";
+// import { sleep, Time } from "#/common/Time";
 import {
   CreateSourceRequest,
   DeleteSourceRequest,
@@ -72,7 +72,7 @@ export class MockSourceApi implements SourceApiInterface {
   async listSources(
     _initOverrides?: RequestInit | InitOverrideFunction
   ): Promise<Array<Source>> {
-    // await sleep(10 * Time.Second);
+    // await sleep(3 * Time.Second);
     const { default: json } = await import("./responses/up-to-date.json");
     return json as unknown as Array<Source>;
   }
