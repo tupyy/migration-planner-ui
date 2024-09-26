@@ -1,10 +1,7 @@
-.gitignore
 .npmignore
 README.md
-package.json
 src/apis/ImageApi.ts
 src/apis/SourceApi.ts
-src/apis/index.ts
 src/index.ts
 src/models/Infra.ts
 src/models/InfraDatastoresInner.ts
@@ -20,5 +17,3 @@ src/models/VMResourceBreakdownHistogram.ts
 src/models/VMs.ts
 src/models/index.ts
 src/runtime.ts
-tsconfig.esm.json
-tsconfig.json

@@ -27,3 +27,4 @@ package.json
 tsconfig.esm.json
 tsconfig.json
 .gitignore
+.npmignore
