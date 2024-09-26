@@ -46,7 +46,7 @@ export const router = createBrowserRouter([
   {
     path: "/error/:code",
     lazy: async () => {
-      const { default: ErrorPage } = await import("#/common/ErrorPage");
+      const { default: ErrorPage } = await import("../components/ErrorPage");
 
       return {
         Component: ErrorPage,
@@ -56,7 +56,7 @@ export const router = createBrowserRouter([
   {
     path: "*",
     lazy: async () => {
-      const { default: ErrorPage } = await import("#/common/ErrorPage");
+      const { default: ErrorPage } = await import("../components/ErrorPage");
 
       return {
         element: (

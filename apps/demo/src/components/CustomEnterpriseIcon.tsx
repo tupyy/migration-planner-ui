@@ -1,5 +1,5 @@
 import React from "react";
-import { SVGIcon } from "#/common/SVGIcon";
+import { SVGIcon } from "#/components/SVGIcon";
 
 export const CustomEnterpriseIcon: React.FC = () => (
   <SVGIcon viewBox="0 0 54 54">

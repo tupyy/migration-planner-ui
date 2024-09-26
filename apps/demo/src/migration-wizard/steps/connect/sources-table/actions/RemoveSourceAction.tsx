@@ -7,7 +7,7 @@ import {
   Text,
 } from "@patternfly/react-core";
 import { TrashIcon } from "@patternfly/react-icons";
-import { ConfirmationModal } from "#/common/ConfirmationModal";
+import { ConfirmationModal } from "#/components/ConfirmationModal";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace RemoveSourceAction {

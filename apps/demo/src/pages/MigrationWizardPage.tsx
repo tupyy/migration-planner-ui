@@ -1,5 +1,5 @@
 import React from "react";
-import { AppPage } from "#/common/AppPage";
+import { AppPage } from "#/components/AppPage";
 import { MigrationWizard } from "#/migration-wizard/MigrationWizard";
 import { Provider as DiscoverySourcesProvider } from "#/migration-wizard/contexts/discovery-sources/Provider";
 
