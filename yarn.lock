@@ -2503,7 +2503,6 @@ __metadata:
   resolution: "demo@workspace:apps/demo"
   dependencies:
     "@emotion/css": "npm:^11.13.0"
-    "@migration-planner-ui/agent-client": "workspace:^"
     "@migration-planner-ui/api-client": "workspace:^"
     "@migration-planner-ui/ioc": "workspace:^"
     "@patternfly/react-charts": "npm:7.4.1"

@@ -31,6 +31,6 @@
   "include": ["src"],
   "references": [
     { "path": "../../packages/api-client" },
-    { "path": "../../packages/agent-client" }
+    { "path": "../../packages/ioc" }
   ]
 }
