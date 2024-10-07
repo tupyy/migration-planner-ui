@@ -1,4 +1,4 @@
-name: Create a new release
+name: Create a new release and update latest
 
 on:
   release:
@@ -40,3 +40,36 @@ jobs:
           asset_path: ./apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz
           asset_name: agent-${{ github.event.release.tag_name }}.tgz
           asset_content_type: application/gzip
+
+      - name: Copy asset for latest
+        run: cp apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz apps/agent/dist/agent-latest.tgz
+
+      - name: Update latest release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Delete existing 'latest' tag
+          git push --delete origin latest || true
+          
+          # Create new 'latest' tag
+          git tag -f latest ${{ github.sha }}
+          git push -f origin latest
+          
+          # Get the upload URL for the 'latest' release
+          upload_url=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/latest" \
+            | jq -r '.upload_url' | sed 's/{?name,label}//g')
+          
+          # If 'latest' release doesn't exist, create it
+          if [ "$upload_url" = "null" ]; then
+            response=$(curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+              -d '{"tag_name": "latest", "name": "Latest Release", "body": "This is always the latest release"}' \
+              "https://api.github.com/repos/${{ github.repository }}/releases")
+            upload_url=$(echo "$response" | jq -r '.upload_url' | sed 's/{?name,label}//g')
+          fi
+          
+          # Upload the asset to the 'latest' release
+          curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/gzip" \
+            --data-binary @apps/agent/dist/agent-latest.tgz \
+            "${upload_url}?name=agent-latest.tgz"
