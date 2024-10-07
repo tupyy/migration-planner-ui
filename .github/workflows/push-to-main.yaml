@@ -41,6 +41,12 @@ jobs:
           artifact_name="agent-${{ github.sha }}.tgz"
           artifact_path="apps/agent/dist/$artifact_name"
           
+          # Verify file exists
+          if [ ! -f "$artifact_path" ]; then
+            echo "Error: File $artifact_path does not exist"
+            exit 1
+          fi
+          
           # Create a new artifact
           response=$(curl -sS -X POST \
             -H "Authorization: token $GITHUB_TOKEN" \
@@ -48,13 +54,34 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/actions/artifacts" \
             -d "{\"name\":\"$artifact_name\",\"retention_days\":1}")
           
-          upload_url=$(echo $response | jq -r .upload_url)
+          echo "API Response: $response"
+          
+          # Check for errors in the response
+          if echo "$response" | jq -e '.message' > /dev/null; then
+            echo "Error from GitHub API: $(echo "$response" | jq -r '.message')"
+            exit 1
+          fi
+          
+          upload_url=$(echo "$response" | jq -r '.upload_url')
+          
+          if [ -z "$upload_url" ] || [ "$upload_url" = "null" ]; then
+            echo "Error: Failed to get upload URL from GitHub API"
+            exit 1
+          fi
           
           # Upload the artifact
-          curl -sS -X PUT \
+          upload_response=$(curl -sS -X PUT \
             -H "Authorization: token $GITHUB_TOKEN" \
             -H "Content-Type: application/gzip" \
             -T "$artifact_path" \
-            "$upload_url"
+            "$upload_url")
+          
+          echo "Upload Response: $upload_response"
+          
+          # Check for errors in the upload response
+          if echo "$upload_response" | jq -e '.message' > /dev/null; then
+            echo "Error uploading artifact: $(echo "$upload_response" | jq -r '.message')"
+            exit 1
+          fi
           
           echo "Artifact $artifact_name uploaded successfully"
