@@ -1,29 +1,42 @@
-name: Create Release with TGZ
+name: Create a new release
 
 on:
   release:
     types: [created]
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '20'
+      
+      - name: Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@4.5.0 --activate
+
       - name: Install dependencies
         run: yarn install
-      - name: Bundle agent
+
+      - name: Build and bundle
         run: |
           cd apps/agent
           yarn bundle
+
+      - name: Rename bundle
+        run: mv apps/agent/dist/*.tgz apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz
+
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./apps/agent/*.tgz
-          asset_name: agent-${{ github.sha }}.tgz
+          asset_path: ./apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz
+          asset_name: agent-${{ github.event.release.tag_name }}.tgz
           asset_content_type: application/gzip
