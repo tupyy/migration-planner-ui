@@ -39,3 +39,6 @@ jobs:
         with:
           name: agent-bundle
           path: apps/agent/dist/agent-${{ github.sha }}.tgz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
