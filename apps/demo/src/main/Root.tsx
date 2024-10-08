@@ -10,13 +10,12 @@ import {
   Container,
   Provider as DependencyInjectionProvider,
 } from "@migration-planner-ui/ioc";
-import { PLANNER_BASEPATH } from "./Constants";
 import { router } from "./Router";
 import { Symbols } from "./Symbols";
 
 function getConfiguredContainer(): Container {
   const plannerApiConfig = new Configuration({
-    basePath: PLANNER_BASEPATH,
+    basePath: `/planner`
   });
   const container = new Container();
   container.register(Symbols.SourceApi, new SourceApi(plannerApiConfig));
