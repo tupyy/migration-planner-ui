@@ -4,24 +4,10 @@ import {
   StackItem,
   TextContent,
   Text,
-  Panel,
-  PanelMain,
-  PanelHeader,
-  List,
-  OrderType,
-  ListItem,
-  Icon,
-  Alert,
-  AlertActionLink,
   Radio,
 } from "@patternfly/react-core";
-import { ClusterIcon } from "@patternfly/react-icons";
-import { SourcesTable } from "#/migration-wizard/steps/connect/sources-table/SourcesTable";
-import { useDiscoverySources } from "#/migration-wizard/contexts/discovery-sources/Context";
 
 export const PrepareMigrationStep: React.FC = () => {
-  const discoverySourcesContext = useDiscoverySources();
-  const [firstSource, ..._otherSources] = discoverySourcesContext.sources;
 
   return (
     <Stack hasGutter>
