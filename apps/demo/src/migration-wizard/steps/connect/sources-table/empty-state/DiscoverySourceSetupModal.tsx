@@ -6,6 +6,7 @@ import {
   FormHelperText,
   HelperText,
   HelperTextItem,
+  TextArea,
   TextInput,
 } from "@patternfly/react-core";
 import {
@@ -84,6 +85,27 @@ export const DiscoverySourceSetupModal: React.FC<
               </HelperText>
             </FormHelperText>
           </FormGroup>
+          <FormGroup
+            label="SSH Key"
+            isRequired
+            fieldId="discovery-source-sshkey-form-control"
+          >
+            <TextArea
+              id="discovery-source-name-form-control"
+              name="discoverySourceSshKey"
+              type="text"
+              placeholder="Example: ssh-rsa AA...a"
+              isRequired
+              aria-describedby="sshkey-helper-text"
+            />
+            <FormHelperText>
+              <HelperText>
+                <HelperTextItem variant="default" id="sshkey-helper-text">
+                  Enter your SSH public key to enable SSH acces to the OVA image.
+                </HelperTextItem>
+              </HelperText>
+            </FormHelperText>
+          </FormGroup>
         </Form>
       </ModalBody>
       <ModalFooter>
@@ -94,7 +116,7 @@ export const DiscoverySourceSetupModal: React.FC<
           variant="primary"
           isDisabled={isDisabled}
         >
-          Download
+          Download OVA Image
         </Button>
       </ModalFooter>
     </Modal>
