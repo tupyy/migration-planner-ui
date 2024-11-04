@@ -8,7 +8,6 @@ import { DEFAULT_POLLING_DELAY, VALUE_NOT_AVAILABLE } from "./Constants";
 import { SourceStatusView } from "./SourceStatusView";
 import { useDiscoverySources } from "#/migration-wizard/contexts/discovery-sources/Context";
 import { Radio } from "@patternfly/react-core";
-import { Source } from "@migration-planner-ui/api-client/models";
 
 export const SourcesTable: React.FC = () => {
   const discoverySourcesContext = useDiscoverySources();
