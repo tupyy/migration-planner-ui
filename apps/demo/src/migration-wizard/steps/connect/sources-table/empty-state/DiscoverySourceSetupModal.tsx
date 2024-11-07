@@ -52,7 +52,7 @@ export const DiscoverySourceSetupModal: React.FC<DiscoverySourceSetupModalProps>
   const { isOpen = false, isDisabled = false, onClose, onSubmit } = props;
 
   const [sshKey, setSshKey] = useState("");
-  const [isSshKeyValid, setIsSshKeyValid] = useState(false);
+  const [isSshKeyValid, setIsSshKeyValid] = useState<true | false | undefined>(undefined);
   const [sshKeyErrorMessage, setSshKeyErrorMessage] = useState("");
 
   // Validate SSH key when it changes
@@ -136,7 +136,7 @@ export const DiscoverySourceSetupModal: React.FC<DiscoverySourceSetupModalProps>
               aria-describedby="sshkey-helper-text"
               value={sshKey}
               onChange={(value) => handleSshKeyChange(value)}
-              validated={isSshKeyValid ? "success" : "error"}
+              validated={isSshKeyValid === undefined ? "default" : isSshKeyValid ? "success" : "error"}
             />
             {!isSshKeyValid && (
               <FormHelperText>
