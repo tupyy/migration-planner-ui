@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Button,
   Form,
@@ -15,21 +15,51 @@ import {
   ModalFooter,
   ModalHeader,
 } from "@patternfly/react-core/next";
+import * as Yup from 'yup';
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-export namespace DiscoverySourceSetupModal {
-  export type Props = {
-    isOpen?: boolean;
-    isDisabled?: boolean;
-    onClose?: ((event: KeyboardEvent | React.MouseEvent) => void) | undefined;
-    onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
-  };
-}
+const SSH_PUBLIC_KEY_REGEX =
+  /^(ssh-rsa AAAAB3NzaC1yc2|ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNT|ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzOD|ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1Mj|ssh-ed25519 AAAAC3NzaC1lZDI1NTE5|ssh-dss AAAAB3NzaC1kc3)[0-9A-Za-z+/]+[=]{0,3}( .*)?$/;
 
-export const DiscoverySourceSetupModal: React.FC<
-  DiscoverySourceSetupModal.Props
-> = (props) => {
+export const trimSshPublicKey = (key: string) =>
+  key
+    .split('\n')
+    .map((row) => row.trim())
+    .filter(Boolean)
+    .join('\n');
+
+// Define your validation schema
+export const sshPublicKeyValidationSchema = Yup.string().test(
+  'ssh-public-key',
+  'SSH public key must consist of "[TYPE] key [[EMAIL]]", supported types are: ssh-rsa, ssh-ed25519, ecdsa-[VARIANT]. A single key can be provided only.',
+  (value?: string) => {
+    if (!value) {
+      return true;
+    }
+
+    return !!trimSshPublicKey(value).match(SSH_PUBLIC_KEY_REGEX);
+  },
+);
+
+// Your component
+export const DiscoverySourceSetupModal: React.FC<DiscoverySourceSetupModal.Props> = (props) => {
   const { isOpen = false, isDisabled = false, onClose, onSubmit } = props;
+
+  const [sshKey, setSshKey] = useState("");
+  const [isSshKeyValid, setIsSshKeyValid] = useState(false);
+  const [sshKeyErrorMessage, setSshKeyErrorMessage] = useState("");
+
+  // Validate SSH key when it changes
+  const handleSshKeyChange = async (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = event.target.value;
+    setSshKey(value);
+    const isValid = await sshPublicKeyValidationSchema.isValid(value);
+    setIsSshKeyValid(isValid);
+    if (!isValid) {
+      setSshKeyErrorMessage("SSH key is not valid.");
+    } else {
+      setSshKeyErrorMessage("");
+    }
+  };
 
   const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
     (event) => {
@@ -91,17 +121,29 @@ export const DiscoverySourceSetupModal: React.FC<
             fieldId="discovery-source-sshkey-form-control"
           >
             <TextArea
-              id="discovery-source-name-form-control"
+              id="discovery-source-sshkey-form-control"
               name="discoverySourceSshKey"
               type="text"
               placeholder="Example: ssh-rsa AA...a"
               isRequired
               aria-describedby="sshkey-helper-text"
+              value={sshKey}
+              onChange={(value) => handleSshKeyChange(value)}
+              validated={isSshKeyValid ? "success" : "error"}
             />
+            {!isSshKeyValid && (
+              <FormHelperText>
+                <HelperText>
+                  <HelperTextItem variant="error" id="sshkey-helper-text">
+                    {sshKeyErrorMessage}
+                  </HelperTextItem>
+                </HelperText>
+              </FormHelperText>
+            )}
             <FormHelperText>
               <HelperText>
                 <HelperTextItem variant="default" id="sshkey-helper-text">
-                  Enter your SSH public key to enable SSH acces to the OVA image.
+                  Enter your SSH public key to enable SSH access to the OVA image.
                 </HelperTextItem>
               </HelperText>
             </FormHelperText>
@@ -114,7 +156,7 @@ export const DiscoverySourceSetupModal: React.FC<
           type="submit"
           key="confirm"
           variant="primary"
-          isDisabled={isDisabled}
+          isDisabled={isDisabled || !isSshKeyValid}
         >
           Download OVA Image
         </Button>
