@@ -42,15 +42,20 @@ export const sshPublicKeyValidationSchema = Yup.string().test(
   },
 );
 
-export interface DiscoverySourceSetupModalProps {
-  isOpen?: boolean;
-  isDisabled?: boolean;
-  onClose: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+// eslint-disable-next-line @typescript-eslint/no-namespace
+export namespace DiscoverySourceSetupModal {
+  export type Props = {
+    isOpen?: boolean;
+    isDisabled?: boolean;
+    onClose?: ((event: KeyboardEvent | React.MouseEvent) => void) | undefined;
+    onSubmit: React.FormEventHandler<HTMLFormElement> | undefined;
+  };
 }
 
 // Your component
-export const DiscoverySourceSetupModal: React.FC<DiscoverySourceSetupModalProps> = (props) => {
+export const DiscoverySourceSetupModal: React.FC<
+  DiscoverySourceSetupModal.Props
+> = (props) => {
   const { isOpen = false, isDisabled = false, onClose, onSubmit } = props;
 
   const [sshKey, setSshKey] = useState("");
