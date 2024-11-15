@@ -33,6 +33,7 @@ export interface LoginFormViewModelInterface {
   alertActionLinkText?: string;
   shouldDisplayAlert: boolean;
   handleSubmit: React.FormEventHandler<HTMLFormElement>;
+  handleReturnToAssistedMigration: () => void;
 }
 
 const _computeFormControlVariant = (
@@ -74,6 +75,8 @@ export const useViewModel = (): LoginFormViewModelInterface => {
         setFormState(FormStates.WaitingForCredentials);
         break;
       case SourceStatus.SourceStatusGatheringInitialInventory:
+        setFormState(FormStates.GatheringInventory);
+        break;
       case SourceStatus.SourceStatusUpToDate:
         setFormState(FormStates.CredentialsAccepted);
         break;
@@ -134,7 +137,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           return [
             {
               id: 1,
-              text: "The Migration Planner has connected to your VMware environment",
+              text: "The migration discovery WM is connected to your VMware environment",
             },
           ];
         case FormStates.InvalidCredentials:
@@ -160,6 +163,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           FormStates.CheckingStatus,
           FormStates.WaitingForCredentials,
           FormStates.Submitting,
+          FormStates.GatheringInventory
         ].includes(formState),
       [formState]
     ),
@@ -218,5 +222,9 @@ export const useViewModel = (): LoginFormViewModelInterface => {
       },
       [agentApi, navigateTo]
     ),
+    handleReturnToAssistedMigration: useCallback(() => {
+      const assistedMigrationUrl = import.meta.env.ASSISTED_MIGRATION_URL || 'http://localhost:3000/migrate/wizard';
+      window.open(assistedMigrationUrl, '_blank', 'noopener,noreferrer');
+    }, []),
   };
 };
