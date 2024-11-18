@@ -137,7 +137,7 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           return [
             {
               id: 1,
-              text: "The migration discovery WM is connected to your VMware environment",
+              text: "The migration discovery VM is connected to your VMware environment",
             },
           ];
         case FormStates.InvalidCredentials:

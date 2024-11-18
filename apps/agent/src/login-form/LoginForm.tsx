@@ -100,7 +100,7 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
           </FormGroup>
 
           <FormGroup
-            label="WMware Username"
+            label="VMware Username"
             isRequired
             fieldId="username-form-control"
             hidden={
