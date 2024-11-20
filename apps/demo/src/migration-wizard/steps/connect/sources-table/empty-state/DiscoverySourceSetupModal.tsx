@@ -134,7 +134,7 @@ export const DiscoverySourceSetupModal: React.FC<
             <FormHelperText>
               <HelperText>
                 <HelperTextItem variant={sshKeyError ? 'error' : 'default'} id="sshkey-helper-text">
-                  {sshKeyError || "Enter your SSH public key to enable SSH access to the OVA image."}
+                  {sshKeyError || "Enter your SSH public key for the 'core' user to enable SSH access to the OVA image."}
                 </HelperTextItem>
               </HelperText>
             </FormHelperText>
