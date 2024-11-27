@@ -11,6 +11,7 @@ import {
   Badge,
   Flex,
   FlexItem,
+  Progress,
 } from "@patternfly/react-core";
 import {
   CogsIcon,
@@ -34,7 +35,7 @@ import type {
 } from "@migration-planner-ui/api-client/models";
 import { useDiscoverySources } from "#/migration-wizard/contexts/discovery-sources/Context";
 import { ReportTable } from "./ReportTable";
-import { ReportBarChart } from "./ReportBarChart";
+import { ReportPieChart } from "./ReportPieChart";
 
 export const DiscoveryStep: React.FC = () => {
   const discoverSourcesContext = useDiscoverySources();
@@ -72,26 +73,41 @@ export const DiscoveryStep: React.FC = () => {
   };
 
   const computeStatsViewData: TreeViewDataItem = {
-    title: "Compute",
+    title: "Compute per VM",
     icon: <MicrochipIcon />,
     id: "compute",
-    name: (
-      <Flex
-        fullWidth={{ default: "fullWidth" }}
-        spaceItems={{ default: "spaceItemsXl" }}
-      >
-        <FlexItem>
-          <ReportBarChart histogram={cpuCores.histogram} title="CPU Cores" />
-        </FlexItem>
-        <FlexItem>
-          <ReportBarChart histogram={ramGB.histogram} title="Memory" />
-        </FlexItem>
-      </Flex>
-    ),
+    name: "",
+    children: [
+      {
+        title: "Details",
+        id: "compute-details",
+        name: (
+          <Flex
+            fullWidth={{ default: "fullWidth" }}
+            spaceItems={{ default: "spaceItems4xl" }}
+          >
+            <FlexItem>
+              <ReportPieChart
+                histogram={cpuCores.histogram}
+                title="CPU Cores"
+                legendLabel="CPU Cores"
+              />
+            </FlexItem>
+            <FlexItem>
+              <ReportPieChart
+                histogram={ramGB.histogram}
+                title="Memory"
+                legendLabel="GB"
+              />
+            </FlexItem>
+          </Flex>
+        ),
+      },
+    ],
   };
 
   const diskStatsViewData: TreeViewDataItem = {
-    title: "Disk size",
+    title: "Disk size per VM",
     icon: <HddIcon />,
     name: (
       <>
@@ -108,18 +124,20 @@ export const DiscoveryStep: React.FC = () => {
         name: (
           <Flex
             fullWidth={{ default: "fullWidth" }}
-            spaceItems={{ default: "spaceItemsXl" }}
+            spaceItems={{ default: "spaceItems4xl" }}
           >
             <FlexItem>
-              <ReportBarChart
+              <ReportPieChart
                 histogram={diskGB.histogram}
-                title="Disk capacity per VM"
+                title="Disk capacity"
+                legendLabel="GB"
               />
             </FlexItem>
             <FlexItem>
-              <ReportBarChart
+              <ReportPieChart
                 histogram={diskCount.histogram}
-                title="Number of disks per VM"
+                title="Number of disks"
+                legendLabel="Disks"
               />
             </FlexItem>
           </Flex>
@@ -283,10 +301,24 @@ export const DiscoveryStep: React.FC = () => {
       {
         title: "Datastores",
         name: (
-          <ReportTable<InfraDatastoresInner>
-            data={datastores}
-            columns={["Total", "Free", "Type"]}
-            fields={["totalCapacityGB", "freeCapacityGB", "type"]}
+          <ReportTable<
+            InfraDatastoresInner & {
+              usage: JSX.Element;
+            }
+          >
+            data={datastores.map((ds) => ({
+              ...ds,
+              usage: (
+                <div style={{ width: "200px" }}>
+                  <Progress
+                    value={(ds.freeCapacityGB / ds.totalCapacityGB) * 100}
+                    size="sm"
+                  />
+                </div>
+              ),
+            }))}
+            columns={["Total", "Free", "Type", "Usage %"]}
+            fields={["totalCapacityGB", "freeCapacityGB", "type", "usage"]}
           />
         ),
         id: "datastores",
