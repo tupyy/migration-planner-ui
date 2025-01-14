@@ -26,6 +26,7 @@ import {
 import { LoginFormViewModelInterface } from "./hooks/UseViewModel";
 import { FormStates } from "./FormStates";
 import { CheckCircleIcon } from "@patternfly/react-icons";
+import { getConfigurationBasePath } from "#/main/Root";
 import globalSuccessColor100 from "@patternfly/react-tokens/dist/esm/global_success_color_100";
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -244,13 +245,22 @@ export const LoginForm: React.FC<LoginForm.Props> = (props) => {
               Log in
             </Button>)}
             {(vm.formState === FormStates.CredentialsAccepted || vm.formState === FormStates.GatheringInventory) && (
-              <Button
-                variant="primary"
-                onClick={vm.handleReturnToAssistedMigration}
-                style={{ marginLeft: "16px" }}
-              >
-                Go back to assessment wizard
-              </Button>
+              <>
+                <Button
+                  variant="primary"
+                  onClick={vm.handleReturnToAssistedMigration}
+                  style={{ marginLeft: "16px" }}
+                >
+                  Go back to assessment wizard
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => window.open(getConfigurationBasePath() + "/inventory", "_blank")}
+                  style={{ marginLeft: "16px" }}
+                >
+                  Download Inventory
+                </Button>
+              </>
             )}
           </SplitItem>
           <SplitItem isFilled></SplitItem>

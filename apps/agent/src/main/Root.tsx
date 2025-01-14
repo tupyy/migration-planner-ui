@@ -14,13 +14,13 @@ import { router } from "./Router";
 import { Symbols } from "./Symbols";
 import { AgentUIVersion } from "#/common/AgentUIVersion";
 
-function getConfigurationBasePath(): string {
+export const getConfigurationBasePath = (): string => {
   if (import.meta.env.PROD) {
     return `${window.location.origin}/api/v1`;
   }
 
   return `${window.location.origin}/agent/api/v1`;
-}
+};
 
 function getConfiguredContainer(): Container {
   const agentApiConfig = new Configuration({
