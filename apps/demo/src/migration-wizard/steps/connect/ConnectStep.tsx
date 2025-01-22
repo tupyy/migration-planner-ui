@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Stack,
   StackItem,
@@ -31,14 +31,6 @@ export const ConnectStep: React.FC = () => {
     setShouldShowDiscoverySetupModal((lastState) => !lastState);
   }, []);
   const hasAgents = discoverySourcesContext.agents && discoverySourcesContext.agents.length > 0;
-  const [firstAgent, ..._otherAgents] = discoverySourcesContext.agents || [];
-  
-  useEffect(() => {
-    if (!discoverySourcesContext.agentSelected && firstAgent) {
-      discoverySourcesContext.selectAgent(firstAgent);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstAgent]);
 
   return (
     <Stack hasGutter>
@@ -110,7 +102,6 @@ export const ConnectStep: React.FC = () => {
               const sshKey = form["discoverySourceSshKey"].value as string;
               await discoverySourcesContext.downloadSource(sshKey);
               toggleDiscoverySourceSetupModal();
-              //await discoverySourcesContext.listSources();
               await discoverySourcesContext.listAgents();
             }}
           />
