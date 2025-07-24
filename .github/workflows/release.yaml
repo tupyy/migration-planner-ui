@@ -27,6 +27,33 @@ jobs:
       - name: Build all packaged
         run: yarn all:build
 
+      - name: Build and bundle agent
+        run: |
+          cd apps/agent
+          yarn bundle
+
+      - name: Rename agent bundle
+        run: |
+          if ls apps/agent/dist/*.tgz 1> /dev/null 2>&1; then
+            mv apps/agent/dist/*.tgz apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz
+          else
+            echo "Error: No .tgz file found in apps/agent/dist/"
+            exit 1
+          fi
+
+      - name: Upload Agent Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz
+          asset_name: agent-${{ github.event.release.tag_name }}.tgz
+          asset_content_type: application/gzip
+
+      - name: Copy agent asset for latest
+        run: cp apps/agent/dist/agent-${{ github.event.release.tag_name }}.tgz apps/agent/dist/agent-latest.tgz
+
       - name: Update latest release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,6 +73,16 @@ jobs:
             upload_url=$(echo "$response" | jq -r '.upload_url' | sed 's/{?name,label}//g')
           fi
           
+          response=$(curl -s -w "%{http_code}" -X POST -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Content-Type: application/gzip" \
+            --data-binary @apps/agent/dist/agent-latest.tgz \
+            "${upload_url}?name=agent-latest.tgz")
+          http_code="${response: -3}"
++          if [ "$http_code" -ne 201 ]; then
++            echo "Failed to upload agent-latest.tgz. HTTP status: $http_code"
++            exit 1
++          fi
+
       - name: Configure npm credentials
         run: echo "//registry.npmjs.org/:_authToken=${NPM_AUTH_TOKEN}" > ~/.npmrc
         env:
