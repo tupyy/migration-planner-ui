@@ -12,19 +12,21 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { VmNetwork } from './VmNetwork';
+import { mapValues } from '../runtime.js';
+import type { VmNetwork } from './VmNetwork.js';
 import {
     VmNetworkFromJSON,
     VmNetworkFromJSONTyped,
     VmNetworkToJSON,
-} from './VmNetwork';
-import type { AgentProxy } from './AgentProxy';
+    VmNetworkToJSONTyped,
+} from './VmNetwork.js';
+import type { AgentProxy } from './AgentProxy.js';
 import {
     AgentProxyFromJSON,
     AgentProxyFromJSONTyped,
     AgentProxyToJSON,
-} from './AgentProxy';
+    AgentProxyToJSONTyped,
+} from './AgentProxy.js';
 
 /**
  * 
@@ -75,10 +77,15 @@ export function SourceInfraFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-export function SourceInfraToJSON(value?: SourceInfra | null): any {
+export function SourceInfraToJSON(json: any): SourceInfra {
+    return SourceInfraToJSONTyped(json, false);
+}
+
+export function SourceInfraToJSONTyped(value?: SourceInfra | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'proxy': AgentProxyToJSON(value['proxy']),

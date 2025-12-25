@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -64,10 +64,15 @@ export function OsInfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Os
     };
 }
 
-export function OsInfoToJSON(value?: OsInfo | null): any {
+export function OsInfoToJSON(json: any): OsInfo {
+    return OsInfoToJSONTyped(json, false);
+}
+
+export function OsInfoToJSONTyped(value?: OsInfo | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'count': value['count'],

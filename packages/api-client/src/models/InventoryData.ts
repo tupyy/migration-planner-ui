@@ -12,25 +12,28 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { VCenter } from './VCenter';
+import { mapValues } from '../runtime.js';
+import type { VCenter } from './VCenter.js';
 import {
     VCenterFromJSON,
     VCenterFromJSONTyped,
     VCenterToJSON,
-} from './VCenter';
-import type { Infra } from './Infra';
+    VCenterToJSONTyped,
+} from './VCenter.js';
+import type { Infra } from './Infra.js';
 import {
     InfraFromJSON,
     InfraFromJSONTyped,
     InfraToJSON,
-} from './Infra';
-import type { VMs } from './VMs';
+    InfraToJSONTyped,
+} from './Infra.js';
+import type { VMs } from './VMs.js';
 import {
     VMsFromJSON,
     VMsFromJSONTyped,
     VMsToJSON,
-} from './VMs';
+    VMsToJSONTyped,
+} from './VMs.js';
 
 /**
  * 
@@ -83,10 +86,15 @@ export function InventoryDataFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-export function InventoryDataToJSON(value?: InventoryData | null): any {
+export function InventoryDataToJSON(json: any): InventoryData {
+    return InventoryDataToJSONTyped(json, false);
+}
+
+export function InventoryDataToJSONTyped(value?: InventoryData | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'vcenter': VCenterToJSON(value['vcenter']),

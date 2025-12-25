@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { JobStatus } from './JobStatus';
+import { mapValues } from '../runtime.js';
+import type { JobStatus } from './JobStatus.js';
 import {
     JobStatusFromJSON,
     JobStatusFromJSONTyped,
     JobStatusToJSON,
-} from './JobStatus';
+    JobStatusToJSONTyped,
+} from './JobStatus.js';
 
 /**
  * Background job for async assessment creation
@@ -80,10 +81,15 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
     };
 }
 
-export function JobToJSON(value?: Job | null): any {
+export function JobToJSON(json: any): Job {
+    return JobToJSONTyped(json, false);
+}
+
+export function JobToJSONTyped(value?: Job | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

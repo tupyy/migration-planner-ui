@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -112,10 +112,15 @@ export function DatastoreFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function DatastoreToJSON(value?: Datastore | null): any {
+export function DatastoreToJSON(json: any): Datastore {
+    return DatastoreToJSONTyped(json, false);
+}
+
+export function DatastoreToJSONTyped(value?: Datastore | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'type': value['type'],

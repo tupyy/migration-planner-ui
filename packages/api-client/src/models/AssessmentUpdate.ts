@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * Update form of the assessment.
  * @export
@@ -48,10 +48,15 @@ export function AssessmentUpdateFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-export function AssessmentUpdateToJSON(value?: AssessmentUpdate | null): any {
+export function AssessmentUpdateToJSON(json: any): AssessmentUpdate {
+    return AssessmentUpdateToJSONTyped(json, false);
+}
+
+export function AssessmentUpdateToJSONTyped(value?: AssessmentUpdate | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

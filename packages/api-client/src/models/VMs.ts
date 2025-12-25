@@ -12,37 +12,42 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { MigrationIssue } from './MigrationIssue';
+import { mapValues } from '../runtime.js';
+import type { MigrationIssue } from './MigrationIssue.js';
 import {
     MigrationIssueFromJSON,
     MigrationIssueFromJSONTyped,
     MigrationIssueToJSON,
-} from './MigrationIssue';
-import type { OsInfo } from './OsInfo';
+    MigrationIssueToJSONTyped,
+} from './MigrationIssue.js';
+import type { OsInfo } from './OsInfo.js';
 import {
     OsInfoFromJSON,
     OsInfoFromJSONTyped,
     OsInfoToJSON,
-} from './OsInfo';
-import type { DiskSizeTierSummary } from './DiskSizeTierSummary';
+    OsInfoToJSONTyped,
+} from './OsInfo.js';
+import type { DiskSizeTierSummary } from './DiskSizeTierSummary.js';
 import {
     DiskSizeTierSummaryFromJSON,
     DiskSizeTierSummaryFromJSONTyped,
     DiskSizeTierSummaryToJSON,
-} from './DiskSizeTierSummary';
-import type { DiskTypeSummary } from './DiskTypeSummary';
+    DiskSizeTierSummaryToJSONTyped,
+} from './DiskSizeTierSummary.js';
+import type { DiskTypeSummary } from './DiskTypeSummary.js';
 import {
     DiskTypeSummaryFromJSON,
     DiskTypeSummaryFromJSONTyped,
     DiskTypeSummaryToJSON,
-} from './DiskTypeSummary';
-import type { VMResourceBreakdown } from './VMResourceBreakdown';
+    DiskTypeSummaryToJSONTyped,
+} from './DiskTypeSummary.js';
+import type { VMResourceBreakdown } from './VMResourceBreakdown.js';
 import {
     VMResourceBreakdownFromJSON,
     VMResourceBreakdownFromJSONTyped,
     VMResourceBreakdownToJSON,
-} from './VMResourceBreakdown';
+    VMResourceBreakdownToJSONTyped,
+} from './VMResourceBreakdown.js';
 
 /**
  * 
@@ -196,15 +201,20 @@ export function VMsFromJSONTyped(json: any, ignoreDiscriminator: boolean): VMs {
         'powerStates': json['powerStates'],
         'os': json['os'] == null ? undefined : json['os'],
         'osInfo': json['osInfo'] == null ? undefined : (mapValues(json['osInfo'], OsInfoFromJSON)),
-        'notMigratableReasons': json['notMigratableReasons'] == null ? undefined : ((json['notMigratableReasons'] as Array<any>).map(MigrationIssueFromJSON)),
-        'migrationWarnings': json['migrationWarnings'] == null ? undefined : ((json['migrationWarnings'] as Array<any>).map(MigrationIssueFromJSON)),
+        'notMigratableReasons': ((json['notMigratableReasons'] as Array<any>).map(MigrationIssueFromJSON)),
+        'migrationWarnings': ((json['migrationWarnings'] as Array<any>).map(MigrationIssueFromJSON)),
     };
 }
 
-export function VMsToJSON(value?: VMs | null): any {
+export function VMsToJSON(json: any): VMs {
+    return VMsToJSONTyped(json, false);
+}
+
+export function VMsToJSONTyped(value?: VMs | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'total': value['total'],

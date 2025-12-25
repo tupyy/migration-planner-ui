@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Inventory } from './Inventory';
+import { mapValues } from '../runtime.js';
+import type { Inventory } from './Inventory.js';
 import {
     InventoryFromJSON,
     InventoryFromJSONTyped,
     InventoryToJSON,
-} from './Inventory';
+    InventoryToJSONTyped,
+} from './Inventory.js';
 
 /**
  * 
@@ -64,14 +65,19 @@ export function SnapshotFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-export function SnapshotToJSON(value?: Snapshot | null): any {
+export function SnapshotToJSON(json: any): Snapshot {
+    return SnapshotToJSONTyped(json, false);
+}
+
+export function SnapshotToJSONTyped(value?: Snapshot | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'inventory': InventoryToJSON(value['inventory']),
-        'createdAt': ((value['createdAt']).toISOString()),
+        'createdAt': value['createdAt'].toISOString(),
     };
 }
 

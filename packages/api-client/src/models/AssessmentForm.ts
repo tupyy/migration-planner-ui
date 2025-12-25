@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Inventory } from './Inventory';
+import { mapValues } from '../runtime.js';
+import type { Inventory } from './Inventory.js';
 import {
     InventoryFromJSON,
     InventoryFromJSONTyped,
     InventoryToJSON,
-} from './Inventory';
+    InventoryToJSONTyped,
+} from './Inventory.js';
 
 /**
  * 
@@ -81,10 +82,15 @@ export function AssessmentFormFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function AssessmentFormToJSON(value?: AssessmentForm | null): any {
+export function AssessmentFormToJSON(json: any): AssessmentForm {
+    return AssessmentFormToJSONTyped(json, false);
+}
+
+export function AssessmentFormToJSONTyped(value?: AssessmentForm | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

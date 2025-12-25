@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -57,10 +57,15 @@ export function DiskTypeSummaryFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function DiskTypeSummaryToJSON(value?: DiskTypeSummary | null): any {
+export function DiskTypeSummaryToJSON(json: any): DiskTypeSummary {
+    return DiskTypeSummaryToJSONTyped(json, false);
+}
+
+export function DiskTypeSummaryToJSONTyped(value?: DiskTypeSummary | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'vmCount': value['vmCount'],

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -56,14 +56,19 @@ export function PresignedUrlFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function PresignedUrlToJSON(value?: PresignedUrl | null): any {
+export function PresignedUrlToJSON(json: any): PresignedUrl {
+    return PresignedUrlToJSONTyped(json, false);
+}
+
+export function PresignedUrlToJSONTyped(value?: PresignedUrl | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'url': value['url'],
-        'expires_at': value['expiresAt'] == null ? undefined : ((value['expiresAt']).toISOString()),
+        'expires_at': value['expiresAt'] == null ? value['expiresAt'] : value['expiresAt'].toISOString(),
     };
 }
 

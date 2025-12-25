@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -57,10 +57,15 @@ export function DiskSizeTierSummaryFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function DiskSizeTierSummaryToJSON(value?: DiskSizeTierSummary | null): any {
+export function DiskSizeTierSummaryToJSON(json: any): DiskSizeTierSummary {
+    return DiskSizeTierSummaryToJSONTyped(json, false);
+}
+
+export function DiskSizeTierSummaryToJSONTyped(value?: DiskSizeTierSummary | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'totalSizeTB': value['totalSizeTB'],

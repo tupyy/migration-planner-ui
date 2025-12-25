@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -49,10 +49,15 @@ export function VCenterFromJSONTyped(json: any, ignoreDiscriminator: boolean): V
     };
 }
 
-export function VCenterToJSON(value?: VCenter | null): any {
+export function VCenterToJSON(json: any): VCenter {
+    return VCenterToJSONTyped(json, false);
+}
+
+export function VCenterToJSONTyped(value?: VCenter | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

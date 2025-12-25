@@ -13,14 +13,14 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   Info,
-} from '../models/index';
+} from '../models/index.js';
 import {
     InfoFromJSON,
     InfoToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 /**
  * InfoApi - interface
@@ -57,8 +57,11 @@ export class InfoApi extends runtime.BaseAPI implements InfoApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/info`;
+
         const response = await this.request({
-            path: `/api/v1/info`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

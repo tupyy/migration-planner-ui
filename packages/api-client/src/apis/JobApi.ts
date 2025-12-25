@@ -13,14 +13,14 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   Job,
-} from '../models/index';
+} from '../models/index.js';
 import {
     JobFromJSON,
     JobToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 export interface CancelJobRequest {
     id: number;
@@ -107,8 +107,12 @@ export class JobApi extends runtime.BaseAPI implements JobApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/assessments/jobs/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/assessments/jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -171,8 +175,11 @@ export class JobApi extends runtime.BaseAPI implements JobApiInterface {
             formParams.append('file', requestParameters['file'] as any);
         }
 
+
+        let urlPath = `/api/v1/assessments/rvtools`;
+
         const response = await this.request({
-            path: `/api/v1/assessments/rvtools`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -205,8 +212,12 @@ export class JobApi extends runtime.BaseAPI implements JobApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/assessments/jobs/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/assessments/jobs/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,

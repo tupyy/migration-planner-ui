@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -62,10 +62,15 @@ export function AgentProxyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function AgentProxyToJSON(value?: AgentProxy | null): any {
+export function AgentProxyToJSON(json: any): AgentProxy {
+    return AgentProxyToJSONTyped(json, false);
+}
+
+export function AgentProxyToJSONTyped(value?: AgentProxy | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'httpUrl': value['httpUrl'],

@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * Migration planner information
  * @export
@@ -57,10 +57,15 @@ export function InfoFromJSONTyped(json: any, ignoreDiscriminator: boolean): Info
     };
 }
 
-export function InfoToJSON(value?: Info | null): any {
+export function InfoToJSON(json: any): Info {
+    return InfoToJSONTyped(json, false);
+}
+
+export function InfoToJSONTyped(value?: Info | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'gitCommit': value['gitCommit'],

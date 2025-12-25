@@ -12,25 +12,28 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { VmNetwork } from './VmNetwork';
+import { mapValues } from '../runtime.js';
+import type { VmNetwork } from './VmNetwork.js';
 import {
     VmNetworkFromJSON,
     VmNetworkFromJSONTyped,
     VmNetworkToJSON,
-} from './VmNetwork';
-import type { AgentProxy } from './AgentProxy';
+    VmNetworkToJSONTyped,
+} from './VmNetwork.js';
+import type { AgentProxy } from './AgentProxy.js';
 import {
     AgentProxyFromJSON,
     AgentProxyFromJSONTyped,
     AgentProxyToJSON,
-} from './AgentProxy';
-import type { Label } from './Label';
+    AgentProxyToJSONTyped,
+} from './AgentProxy.js';
+import type { Label } from './Label.js';
 import {
     LabelFromJSON,
     LabelFromJSONTyped,
     LabelToJSON,
-} from './Label';
+    LabelToJSONTyped,
+} from './Label.js';
 
 /**
  * 
@@ -102,10 +105,15 @@ export function SourceUpdateFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-export function SourceUpdateToJSON(value?: SourceUpdate | null): any {
+export function SourceUpdateToJSON(json: any): SourceUpdate {
+    return SourceUpdateToJSONTyped(json, false);
+}
+
+export function SourceUpdateToJSONTyped(value?: SourceUpdate | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'name': value['name'],

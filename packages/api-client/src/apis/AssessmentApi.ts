@@ -13,12 +13,12 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   Assessment,
   AssessmentForm,
   AssessmentUpdate,
-} from '../models/index';
+} from '../models/index.js';
 import {
     AssessmentFromJSON,
     AssessmentToJSON,
@@ -26,7 +26,7 @@ import {
     AssessmentFormToJSON,
     AssessmentUpdateFromJSON,
     AssessmentUpdateToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 export interface CreateAssessmentRequest {
     assessmentForm: AssessmentForm;
@@ -146,8 +146,11 @@ export class AssessmentApi extends runtime.BaseAPI implements AssessmentApiInter
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/v1/assessments`;
+
         const response = await this.request({
-            path: `/api/v1/assessments`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -180,8 +183,12 @@ export class AssessmentApi extends runtime.BaseAPI implements AssessmentApiInter
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/assessments/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/assessments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -213,8 +220,12 @@ export class AssessmentApi extends runtime.BaseAPI implements AssessmentApiInter
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/assessments/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/assessments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -239,8 +250,11 @@ export class AssessmentApi extends runtime.BaseAPI implements AssessmentApiInter
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/assessments`;
+
         const response = await this.request({
-            path: `/api/v1/assessments`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -281,8 +295,12 @@ export class AssessmentApi extends runtime.BaseAPI implements AssessmentApiInter
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/v1/assessments/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/assessments/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

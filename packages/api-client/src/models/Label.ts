@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -57,10 +57,15 @@ export function LabelFromJSONTyped(json: any, ignoreDiscriminator: boolean): Lab
     };
 }
 
-export function LabelToJSON(value?: Label | null): any {
+export function LabelToJSON(json: any): Label {
+    return LabelToJSONTyped(json, false);
+}
+
+export function LabelToJSONTyped(value?: Label | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'key': value['key'],

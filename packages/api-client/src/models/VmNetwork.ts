@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Ipv4Config } from './Ipv4Config';
+import { mapValues } from '../runtime.js';
+import type { Ipv4Config } from './Ipv4Config.js';
 import {
     Ipv4ConfigFromJSON,
     Ipv4ConfigFromJSONTyped,
     Ipv4ConfigToJSON,
-} from './Ipv4Config';
+    Ipv4ConfigToJSONTyped,
+} from './Ipv4Config.js';
 
 /**
  * 
@@ -55,10 +56,15 @@ export function VmNetworkFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function VmNetworkToJSON(value?: VmNetwork | null): any {
+export function VmNetworkToJSON(json: any): VmNetwork {
+    return VmNetworkToJSONTyped(json, false);
+}
+
+export function VmNetworkToJSONTyped(value?: VmNetwork | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'ipv4': Ipv4ConfigToJSON(value['ipv4']),

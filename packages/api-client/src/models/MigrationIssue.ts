@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -72,10 +72,15 @@ export function MigrationIssueFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-export function MigrationIssueToJSON(value?: MigrationIssue | null): any {
+export function MigrationIssueToJSON(json: any): MigrationIssue {
+    return MigrationIssueToJSONTyped(json, false);
+}
+
+export function MigrationIssueToJSONTyped(value?: MigrationIssue | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

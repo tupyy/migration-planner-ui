@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Inventory } from './Inventory';
+import { mapValues } from '../runtime.js';
+import type { Inventory } from './Inventory.js';
 import {
     InventoryFromJSON,
     InventoryFromJSONTyped,
     InventoryToJSON,
-} from './Inventory';
+    InventoryToJSONTyped,
+} from './Inventory.js';
 
 /**
  * 
@@ -64,10 +65,15 @@ export function UpdateInventoryFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-export function UpdateInventoryToJSON(value?: UpdateInventory | null): any {
+export function UpdateInventoryToJSON(json: any): UpdateInventory {
+    return UpdateInventoryToJSONTyped(json, false);
+}
+
+export function UpdateInventoryToJSONTyped(value?: UpdateInventory | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'agentId': value['agentId'],

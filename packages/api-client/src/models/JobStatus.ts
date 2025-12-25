@@ -58,3 +58,7 @@ export function JobStatusToJSON(value?: JobStatus | null): any {
     return value as any;
 }
 
+export function JobStatusToJSONTyped(value: any, ignoreDiscriminator: boolean): JobStatus {
+    return value as JobStatus;
+}
+

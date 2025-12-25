@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Histogram } from './Histogram';
+import { mapValues } from '../runtime.js';
+import type { Histogram } from './Histogram.js';
 import {
     HistogramFromJSON,
     HistogramFromJSONTyped,
     HistogramToJSON,
-} from './Histogram';
+    HistogramToJSONTyped,
+} from './Histogram.js';
 
 /**
  * 
@@ -88,10 +89,15 @@ export function VMResourceBreakdownFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-export function VMResourceBreakdownToJSON(value?: VMResourceBreakdown | null): any {
+export function VMResourceBreakdownToJSON(json: any): VMResourceBreakdown {
+    return VMResourceBreakdownToJSONTyped(json, false);
+}
+
+export function VMResourceBreakdownToJSONTyped(value?: VMResourceBreakdown | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'total': value['total'],

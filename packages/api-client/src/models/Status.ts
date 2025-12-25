@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * Status is a return value for calls that don't return other objects.
  * @export
@@ -62,10 +62,15 @@ export function StatusFromJSONTyped(json: any, ignoreDiscriminator: boolean): St
     };
 }
 
-export function StatusToJSON(value?: Status | null): any {
+export function StatusToJSON(json: any): Status {
+    return StatusToJSONTyped(json, false);
+}
+
+export function StatusToJSONTyped(value?: Status | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'message': value['message'],

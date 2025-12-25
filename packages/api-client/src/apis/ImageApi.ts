@@ -13,14 +13,14 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   PresignedUrl,
-} from '../models/index';
+} from '../models/index.js';
 import {
     PresignedUrlFromJSON,
     PresignedUrlToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 export interface GetSourceDownloadURLRequest {
     id: string;
@@ -87,8 +87,12 @@ export class ImageApi extends runtime.BaseAPI implements ImageApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources/{id}/image-url`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}/image-url`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -120,8 +124,12 @@ export class ImageApi extends runtime.BaseAPI implements ImageApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources/{id}/image`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}/image`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'HEAD',
             headers: headerParameters,
             query: queryParameters,

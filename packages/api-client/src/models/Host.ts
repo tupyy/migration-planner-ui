@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -85,10 +85,15 @@ export function HostFromJSONTyped(json: any, ignoreDiscriminator: boolean): Host
     };
 }
 
-export function HostToJSON(value?: Host | null): any {
+export function HostToJSON(json: any): Host {
+    return HostToJSONTyped(json, false);
+}
+
+export function HostToJSONTyped(value?: Host | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],

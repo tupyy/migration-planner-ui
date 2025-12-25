@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -65,10 +65,15 @@ export function HistogramFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-export function HistogramToJSON(value?: Histogram | null): any {
+export function HistogramToJSON(json: any): Histogram {
+    return HistogramToJSONTyped(json, false);
+}
+
+export function HistogramToJSONTyped(value?: Histogram | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'minValue': value['minValue'],

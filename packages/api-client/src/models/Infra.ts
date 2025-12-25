@@ -12,25 +12,28 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Datastore } from './Datastore';
+import { mapValues } from '../runtime.js';
+import type { Datastore } from './Datastore.js';
 import {
     DatastoreFromJSON,
     DatastoreFromJSONTyped,
     DatastoreToJSON,
-} from './Datastore';
-import type { Network } from './Network';
+    DatastoreToJSONTyped,
+} from './Datastore.js';
+import type { Network } from './Network.js';
 import {
     NetworkFromJSON,
     NetworkFromJSONTyped,
     NetworkToJSON,
-} from './Network';
-import type { Host } from './Host';
+    NetworkToJSONTyped,
+} from './Network.js';
+import type { Host } from './Host.js';
 import {
     HostFromJSON,
     HostFromJSONTyped,
     HostToJSON,
-} from './Host';
+    HostToJSONTyped,
+} from './Host.js';
 
 /**
  * 
@@ -146,15 +149,20 @@ export function InfraFromJSONTyped(json: any, ignoreDiscriminator: boolean): Inf
         'hostsPerCluster': json['hostsPerCluster'] == null ? undefined : json['hostsPerCluster'],
         'vmsPerCluster': json['vmsPerCluster'] == null ? undefined : json['vmsPerCluster'],
         'hostPowerStates': json['hostPowerStates'],
-        'networks': json['networks'] == null ? undefined : ((json['networks'] as Array<any>).map(NetworkFromJSON)),
-        'datastores': json['datastores'] == null ? undefined : ((json['datastores'] as Array<any>).map(DatastoreFromJSON)),
+        'networks': ((json['networks'] as Array<any>).map(NetworkFromJSON)),
+        'datastores': ((json['datastores'] as Array<any>).map(DatastoreFromJSON)),
     };
 }
 
-export function InfraToJSON(value?: Infra | null): any {
+export function InfraToJSON(json: any): Infra {
+    return InfraToJSONTyped(json, false);
+}
+
+export function InfraToJSONTyped(value?: Infra | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'totalHosts': value['totalHosts'],

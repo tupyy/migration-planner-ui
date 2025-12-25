@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -73,10 +73,15 @@ export function Ipv4ConfigFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-export function Ipv4ConfigToJSON(value?: Ipv4Config | null): any {
+export function Ipv4ConfigToJSON(json: any): Ipv4Config {
+    return Ipv4ConfigToJSONTyped(json, false);
+}
+
+export function Ipv4ConfigToJSONTyped(value?: Ipv4Config | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'ipAddress': value['ipAddress'],

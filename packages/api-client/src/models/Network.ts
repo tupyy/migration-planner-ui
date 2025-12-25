@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -91,10 +91,15 @@ export function NetworkFromJSONTyped(json: any, ignoreDiscriminator: boolean): N
     };
 }
 
-export function NetworkToJSON(value?: Network | null): any {
+export function NetworkToJSON(json: any): Network {
+    return NetworkToJSONTyped(json, false);
+}
+
+export function NetworkToJSONTyped(value?: Network | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'type': value['type'],

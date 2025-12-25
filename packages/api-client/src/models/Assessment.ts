@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { Snapshot } from './Snapshot';
+import { mapValues } from '../runtime.js';
+import type { Snapshot } from './Snapshot.js';
 import {
     SnapshotFromJSON,
     SnapshotFromJSONTyped,
     SnapshotToJSON,
-} from './Snapshot';
+    SnapshotToJSONTyped,
+} from './Snapshot.js';
 
 /**
  * 
@@ -117,14 +118,19 @@ export function AssessmentFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'sourceType': json['sourceType'],
         'sourceId': json['sourceId'] == null ? undefined : json['sourceId'],
         'createdAt': (new Date(json['createdAt'])),
-        'snapshots': json['snapshots'] == null ? undefined : ((json['snapshots'] as Array<any>).map(SnapshotFromJSON)),
+        'snapshots': ((json['snapshots'] as Array<any>).map(SnapshotFromJSON)),
     };
 }
 
-export function AssessmentToJSON(value?: Assessment | null): any {
+export function AssessmentToJSON(json: any): Assessment {
+    return AssessmentToJSONTyped(json, false);
+}
+
+export function AssessmentToJSONTyped(value?: Assessment | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],
@@ -133,7 +139,7 @@ export function AssessmentToJSON(value?: Assessment | null): any {
         'ownerLastName': value['ownerLastName'],
         'sourceType': value['sourceType'],
         'sourceId': value['sourceId'],
-        'createdAt': ((value['createdAt']).toISOString()),
+        'createdAt': value['createdAt'].toISOString(),
         'snapshots': ((value['snapshots'] as Array<any>).map(SnapshotToJSON)),
     };
 }

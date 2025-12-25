@@ -12,13 +12,14 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { InventoryData } from './InventoryData';
+import { mapValues } from '../runtime.js';
+import type { InventoryData } from './InventoryData.js';
 import {
     InventoryDataFromJSON,
     InventoryDataFromJSONTyped,
     InventoryDataToJSON,
-} from './InventoryData';
+    InventoryDataToJSONTyped,
+} from './InventoryData.js';
 
 /**
  * 
@@ -64,19 +65,26 @@ export function InventoryFromJSONTyped(json: any, ignoreDiscriminator: boolean):
         return json;
     }
     return {
+        
         'vcenterId': json['vcenter_id'],
-        'clusters': json['clusters'] == null ? undefined : (mapValues(json['clusters'], InventoryDataFromJSON)),
+        'clusters': (mapValues(json['clusters'], InventoryDataFromJSON)),
         'vcenter': json['vcenter'] == null ? undefined : InventoryDataFromJSON(json['vcenter']),
     };
 }
 
-export function InventoryToJSON(value?: Inventory | null): any {
+export function InventoryToJSON(json: any): Inventory {
+    return InventoryToJSONTyped(json, false);
+}
+
+export function InventoryToJSONTyped(value?: Inventory | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
+        
         'vcenter_id': value['vcenterId'],
-        'clusters': value['clusters'] == null ? undefined : (mapValues(value['clusters'], InventoryDataToJSON)),
+        'clusters': (mapValues(value['clusters'], InventoryDataToJSON)),
         'vcenter': InventoryDataToJSON(value['vcenter']),
     };
 }

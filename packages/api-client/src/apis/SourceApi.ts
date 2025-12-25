@@ -13,14 +13,14 @@
  */
 
 
-import * as runtime from '../runtime';
+import * as runtime from '../runtime.js';
 import type {
   Source,
   SourceCreate,
   SourceUpdate,
   Status,
   UpdateInventory,
-} from '../models/index';
+} from '../models/index.js';
 import {
     SourceFromJSON,
     SourceToJSON,
@@ -32,7 +32,7 @@ import {
     StatusToJSON,
     UpdateInventoryFromJSON,
     UpdateInventoryToJSON,
-} from '../models/index';
+} from '../models/index.js';
 
 export interface CreateSourceRequest {
     sourceCreate: SourceCreate;
@@ -185,8 +185,11 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/v1/sources`;
+
         const response = await this.request({
-            path: `/api/v1/sources`,
+            path: urlPath,
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
@@ -219,8 +222,12 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -245,8 +252,11 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources`;
+
         const response = await this.request({
-            path: `/api/v1/sources`,
+            path: urlPath,
             method: 'DELETE',
             headers: headerParameters,
             query: queryParameters,
@@ -278,8 +288,12 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -304,8 +318,11 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
+        let urlPath = `/api/v1/sources`;
+
         const response = await this.request({
-            path: `/api/v1/sources`,
+            path: urlPath,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -346,8 +363,12 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/v1/sources/{id}/inventory`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}/inventory`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -389,8 +410,12 @@ export class SourceApi extends runtime.BaseAPI implements SourceApiInterface {
 
         headerParameters['Content-Type'] = 'application/json';
 
+
+        let urlPath = `/api/v1/sources/{id}`;
+        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+
         const response = await this.request({
-            path: `/api/v1/sources/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: urlPath,
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,

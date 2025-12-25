@@ -12,31 +12,35 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
-import type { SourceInfra } from './SourceInfra';
+import { mapValues } from '../runtime.js';
+import type { SourceInfra } from './SourceInfra.js';
 import {
     SourceInfraFromJSON,
     SourceInfraFromJSONTyped,
     SourceInfraToJSON,
-} from './SourceInfra';
-import type { Agent } from './Agent';
+    SourceInfraToJSONTyped,
+} from './SourceInfra.js';
+import type { Agent } from './Agent.js';
 import {
     AgentFromJSON,
     AgentFromJSONTyped,
     AgentToJSON,
-} from './Agent';
-import type { Label } from './Label';
+    AgentToJSONTyped,
+} from './Agent.js';
+import type { Label } from './Label.js';
 import {
     LabelFromJSON,
     LabelFromJSONTyped,
     LabelToJSON,
-} from './Label';
-import type { Inventory } from './Inventory';
+    LabelToJSONTyped,
+} from './Label.js';
+import type { Inventory } from './Inventory.js';
 import {
     InventoryFromJSON,
     InventoryFromJSONTyped,
     InventoryToJSON,
-} from './Inventory';
+    InventoryToJSONTyped,
+} from './Inventory.js';
 
 /**
  * 
@@ -134,17 +138,22 @@ export function SourceFromJSONTyped(json: any, ignoreDiscriminator: boolean): So
     };
 }
 
-export function SourceToJSON(value?: Source | null): any {
+export function SourceToJSON(json: any): Source {
+    return SourceToJSONTyped(json, false);
+}
+
+export function SourceToJSONTyped(value?: Source | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],
         'name': value['name'],
         'inventory': InventoryToJSON(value['inventory']),
-        'createdAt': ((value['createdAt']).toISOString()),
-        'updatedAt': ((value['updatedAt']).toISOString()),
+        'createdAt': value['createdAt'].toISOString(),
+        'updatedAt': value['updatedAt'].toISOString(),
         'onPremises': value['onPremises'],
         'agent': AgentToJSON(value['agent']),
         'labels': value['labels'] == null ? undefined : ((value['labels'] as Array<any>).map(LabelToJSON)),

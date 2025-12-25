@@ -12,7 +12,7 @@
  * Do not edit the class manually.
  */
 
-import { mapValues } from '../runtime';
+import { mapValues } from '../runtime.js';
 /**
  * 
  * @export
@@ -112,18 +112,23 @@ export function AgentFromJSONTyped(json: any, ignoreDiscriminator: boolean): Age
     };
 }
 
-export function AgentToJSON(value?: Agent | null): any {
+export function AgentToJSON(json: any): Agent {
+    return AgentToJSONTyped(json, false);
+}
+
+export function AgentToJSONTyped(value?: Agent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
+
     return {
         
         'id': value['id'],
         'status': value['status'],
         'statusInfo': value['statusInfo'],
         'credentialUrl': value['credentialUrl'],
-        'createdAt': ((value['createdAt']).toISOString()),
-        'updatedAt': ((value['updatedAt']).toISOString()),
+        'createdAt': value['createdAt'].toISOString(),
+        'updatedAt': value['updatedAt'].toISOString(),
         'version': value['version'],
     };
 }
