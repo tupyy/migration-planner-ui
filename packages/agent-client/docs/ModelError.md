@@ -7,7 +7,6 @@
 Name | Type
 ------------ | -------------
 `message` | string
-`requestId` | string
 
 ## Example
 
@@ -17,7 +16,6 @@ import type { ModelError } from '@migration-planner-ui/agent-client'
 // TODO: Update the object below with actual values
 const example = {
   "message": null,
-  "requestId": null,
 } satisfies ModelError
 
 console.log(example)

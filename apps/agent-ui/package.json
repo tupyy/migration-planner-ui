@@ -1,5 +1,5 @@
 {
-  "name": "agent-ui",
+  "name": "@migration-planner-ui/agent-ui",
   "private": true,
   "version": "1.0.0-alpha",
   "type": "module",
@@ -9,14 +9,14 @@
     "bundle": "yarn build && yarn pack --out ../../out/%s-%v.tgz",
     "clean": "rm -rf node_modules dist",
     "preview": "yarn run -T vite preview --host 127.0.0.1 --port 4001",
-    "check": "biome check .",
-    "check:fix": "biome check --write .",
-    "format": "biome format --write ."
+    "check": "yarn run -T biome check .",
+    "check:fix": "yarn run -T biome check --write .",
+    "format": "yarn run -T biome format --write ."
   },
   "dependencies": {
     "@emotion/css": "^11.13.0",
-    "@migration-planner-ui/agent-client": "^0.0.11",
-    "@migration-planner-ui/api-client": "^0.0.11",
+    "@migration-planner-ui/agent-client": "workspace:*",
+    "@migration-planner-ui/api-client": "workspace:*",
     "@patternfly/react-core": "^5.4.0",
     "@patternfly/react-icons": "^5.4.0",
     "@patternfly/react-table": "^5.4.0",

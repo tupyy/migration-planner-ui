@@ -8,12 +8,15 @@
 # Swap the comments on the following lines if you wish to use zero-installs
 # In that case, don't forget to run `yarn config set enableGlobalCache false`!
 # Documentation here: https://yarnpkg.com/features/caching#zero-installs
-#!.yarn/cache
-.pnp.*
+!.yarn/cache
+# .pnp.*
 
 node_modules
 dist
 *.local.*
+
+# Direnv CLI
+.envrc
 
 # Logs
 logs
@@ -26,6 +29,7 @@ yarn-error.log*
 .vscode/*
 !.vscode/launch.json
 !.vscode/extensions.json
+!.vscode/settings.json
 .idea
 
 # CI temp directory
@@ -36,4 +40,6 @@ out
 
 .npm/
 .npm-global/
-.cache/
+
+# Act CLI
+.act/

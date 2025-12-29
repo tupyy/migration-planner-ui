@@ -1,8 +1,11 @@
 import "@patternfly/react-core/dist/styles/base.css";
 
-import { AgentApi } from "@migration-planner-ui/agent-client/apis";
-import { Configuration } from "@migration-planner-ui/api-client/runtime";
-import { Container, Provider as DependencyInjectionProvider } from "@migration-planner-ui/ioc";
+import { AgentUiApi } from "@migration-planner-ui/agent-client/apis";
+import { Configuration } from "@migration-planner-ui/agent-client/runtime";
+import {
+  Container,
+  Provider as DependencyInjectionProvider,
+} from "@migration-planner-ui/ioc";
 import { Spinner } from "@patternfly/react-core";
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -24,7 +27,7 @@ function getConfiguredContainer(): Container {
     basePath: getConfigurationBasePath(),
   });
   const container = new Container();
-  container.register(Symbols.AgentApi, new AgentApi(agentApiConfig));
+  container.register(Symbols.AgentApi, new AgentUiApi(agentApiConfig));
 
   return container;
 }

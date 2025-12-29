@@ -1,10 +1,14 @@
-import type { AgentApiInterface } from "@migration-planner-ui/agent-client/apis";
-import { type Credentials, SourceStatus } from "@migration-planner-ui/agent-client/models";
+import type {
+  AgentUiApiInterface,
+  SubmitCredentialsRequest,
+} from "@migration-planner-ui/agent-client/apis";
+// import { SourceStatus,  } from "@migration-planner-ui/agent-client/models";
 import { useInjection } from "@migration-planner-ui/ioc";
 import { AlertVariant } from "@patternfly/react-core";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAsync, useTitle } from "react-use";
+// import { useNavigate } from "react-router-dom";
+// import { useAsync } from "react-use";
+import { useTitle } from "react-use";
 import { newAbortSignal } from "../../common/AbortSignal.ts";
 import type { FormControlValidatedStateVariant } from "../../login-form/Aliases.ts";
 import {
@@ -40,7 +44,9 @@ export interface LoginFormViewModelInterface {
   isDataSharingChecked: boolean;
 }
 
-const _computeFormControlVariant = (formState: FormStates): FormControlValidatedStateVariant => {
+const _computeFormControlVariant = (
+  formState: FormStates,
+): FormControlValidatedStateVariant => {
   switch (formState) {
     case FormStates.CredentialsAccepted:
       return "success";
@@ -54,10 +60,12 @@ const _computeFormControlVariant = (formState: FormStates): FormControlValidated
 
 export const useViewModel = (): LoginFormViewModelInterface => {
   useTitle("Login");
-  const navigateTo = useNavigate();
-  const [formState, setFormState] = useState<FormStates>(FormStates.CheckingStatus);
+  // const navigateTo = useNavigate();
+  const [formState, setFormState] = useState<FormStates>(
+    FormStates.CheckingStatus,
+  );
   const formRef = useRef<HTMLFormElement>();
-  const agentApi = useInjection<AgentApiInterface>(Symbols.AgentApi);
+  const agentApi = useInjection<AgentUiApiInterface>(Symbols.AgentApi);
   const [isDataSharingAllowed, setIsDataSharingAllowed] = useState<boolean>(
     DATA_SHARING_ALLOWED_DEFAULT_STATE,
   );
@@ -65,28 +73,28 @@ export const useViewModel = (): LoginFormViewModelInterface => {
   const [usernameValue, setUsernameValue] = useState<string>("");
   const [passwordValue, setPasswordValue] = useState<string>("");
 
-  useAsync(async () => {
-    try {
-      const res = await agentApi.getStatus();
-      switch (res.status) {
-        case SourceStatus.SourceStatusWaitingForCredentials:
-          setFormState(FormStates.WaitingForCredentials);
-          break;
-        case SourceStatus.SourceStatusGatheringInitialInventory:
-          setFormState(FormStates.GatheringInventory);
-          break;
-        case SourceStatus.SourceStatusUpToDate:
-          setFormState(FormStates.CredentialsAccepted);
-          break;
+  // useAsync(async () => {
+  // 	try {
+  // 		const res = await agentApi.getAgentStatus();
+  // 		switch (res.status) {
+  // 			case SourceStatus.SourceStatusWaitingForCredentials:
+  // 				setFormState(FormStates.WaitingForCredentials);
+  // 				break;
+  // 			case SourceStatus.SourceStatusGatheringInitialInventory:
+  // 				setFormState(FormStates.GatheringInventory);
+  // 				break;
+  // 			case SourceStatus.SourceStatusUpToDate:
+  // 				setFormState(FormStates.CredentialsAccepted);
+  // 				break;
 
-        default:
-          break;
-      }
-    } catch (error) {
-      console.error("Failed to fetch status:", error);
-      setFormState(FormStates.WaitingForCredentials);
-    }
-  });
+  // 			default:
+  // 				break;
+  // 		}
+  // 	} catch (error) {
+  // 		console.error("Failed to fetch status:", error);
+  // 		setFormState(FormStates.WaitingForCredentials);
+  // 	}
+  // });
 
   return {
     formState,
@@ -119,9 +127,11 @@ export const useViewModel = (): LoginFormViewModelInterface => {
     }, []),
     shouldDisableFormControl: useMemo(
       () =>
-        [FormStates.CheckingStatus, FormStates.Submitting, FormStates.CredentialsAccepted].includes(
-          formState,
-        ),
+        [
+          FormStates.CheckingStatus,
+          FormStates.Submitting,
+          FormStates.CredentialsAccepted,
+        ].includes(formState),
       [formState],
     ),
     alertVariant: useMemo(() => {
@@ -194,44 +204,23 @@ export const useViewModel = (): LoginFormViewModelInterface => {
           return;
         }
 
-        const credentials: Credentials = {
-          url: urlValue,
-          username: usernameValue,
-          password: passwordValue,
-          isDataSharingAllowed: isDataSharingAllowed,
+        const credentials: SubmitCredentialsRequest = {
+          credentials: {
+            url: urlValue,
+            username: usernameValue,
+            password: passwordValue,
+            isDataSharingAllowed: isDataSharingAllowed,
+          },
         };
         const signal = newAbortSignal(
           REQUEST_TIMEOUT_MS,
           "The server didn't respond in a timely fashion.",
         );
-        const [statusCodeOK, error] = await agentApi.putCredentials(credentials, {
+        await agentApi.submitCredentials(credentials, {
           signal,
         });
-
-        const status = statusCodeOK ?? error.code;
-        switch (status) {
-          case 204:
-            setFormState(FormStates.CredentialsAccepted);
-            break;
-          case 400:
-            setFormState(FormStates.CredentialsRejected);
-            break;
-          case 401:
-            setFormState(FormStates.InvalidCredentials);
-            break;
-          case 422:
-            setFormState(FormStates.CredentialsRejected);
-            break;
-          default:
-            navigateTo(`/error/${error?.code || 500}`, {
-              state: {
-                message: error?.message || "An unexpected error occurred",
-              },
-            });
-            break;
-        }
       },
-      [agentApi, navigateTo, urlValue, usernameValue, passwordValue, isDataSharingAllowed],
+      [agentApi, urlValue, usernameValue, passwordValue, isDataSharingAllowed],
     ),
     handleChangeDataSharingAllowed: useCallback((checked) => {
       setIsDataSharingAllowed(checked);
