@@ -17,14 +17,24 @@ openapi-generator-cli:
 generate:
 	$(MAKE) openapi-generator-cli ARGS="generate $(ARGS)"
 
+# Cleans up the API client
+.PHONY: _clean-api-client
+_clean-api-client:
+	rm -rf packages/api-client/src packages/api-client/docs;
+
 # Updates the API client
 .PHONY: api-client
-api-client:
+api-client: _clean-api-client
 	$(MAKE) generate ARGS="--generator-key api-client"
+
+# Cleans up the Agent client
+.PHONY: _clean-agent-client
+_clean-agent-client:
+	rm -rf packages/agent-client/src packages/agent-client/docs;
 
 # Updates the Agent client
 .PHONY: agent-client
-agent-client:
+agent-client: _clean-agent-client
 	$(MAKE) generate ARGS="--generator-key agent-client"
 
 # Clean up OpenAPI Generator CLI container image
@@ -38,10 +48,10 @@ help:
 	@echo "Migration Planner UI Makefile"
 	@echo ""
 	@echo "Available targets:"
-	@echo "  openapi-generator-cli   Interact directly with the CLI tool"
-	@echo "  api-client              Update the API client (e.g., make api-client)"
-	@echo "  agent-client            Update the Agent client (e.g., make agent-client)"
-	@echo "  generate                Run openapi-generator, optionally pass --generator-key <key> or other arguments"
+	@echo "  openapi-generator-cli   Executes `openapi-generator-cli` allowing access to all CLI commands"
+	@echo "  api-client              Updates the API client"
+	@echo "  agent-client            Updates the Agent UI client"
+	@echo "  generate                Runs `openapi-generator-cli generate`, optionally pass --generator-key <key> or other arguments"
 	@echo "                          See openapitools.json for keys (e.g., make generate ARGS=\"--generator-key api-client\")"
 	@echo "  clean                   Remove the OpenAPI Generator CLI container image"
 	@echo "  help                    Show this help message"
