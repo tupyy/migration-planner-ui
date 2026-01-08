@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jkilzi/migration-planner-ui.git",
+    "url": "https://github.com/kubev2v/migration-planner-ui.git",
     "directory": "packages/agent-client"
   },
   "type": "module",
@@ -45,7 +45,9 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "yarn run -T tsc -b",
