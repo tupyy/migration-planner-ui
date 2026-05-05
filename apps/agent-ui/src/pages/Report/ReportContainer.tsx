@@ -2,6 +2,7 @@ import { useInjection } from "@migration-planner-ui/ioc";
 import type {
   DefaultApiInterface,
   Inventory,
+  RightsizingClusterUtilization,
   VirtualMachine,
 } from "@openshift-migration-advisor/agent-sdk";
 import {
@@ -63,6 +64,8 @@ export const ReportContainer: React.FC = () => {
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isShareLoading, setIsShareLoading] = useState(false);
   const [shareError, setShareError] = useState<string | null>(null);
+  const [utilizationMetrics, setUtilizationMetrics] =
+    useState<RightsizingClusterUtilization | null>(null);
   // Derive base path for forecaster API (same root as agent API)
   const forecasterBasePath = useMemo(
     () =>
@@ -203,6 +206,45 @@ export const ReportContainer: React.FC = () => {
 
     fetchData();
   }, [agentApi]);
+
+  // Fetch cluster utilization metrics
+  useEffect(() => {
+    // Only fetch metrics when a specific cluster is selected
+    if (selectedClusterId === "all") {
+      setUtilizationMetrics(null);
+      return;
+    }
+
+    const abortController = new AbortController();
+
+    const fetchUtilizationMetrics = async () => {
+      try {
+        const response = await agentApi.getLatestRightsizingClusters({
+          signal: abortController.signal,
+        });
+
+        // Find cluster metrics for the selected cluster
+        const clusterMetrics = response.clusters?.find(
+          (cluster) => cluster.clusterId === selectedClusterId,
+        );
+
+        setUtilizationMetrics(clusterMetrics || null);
+      } catch (err) {
+        // Ignore abort errors
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        console.warn("Failed to fetch utilization metrics:", err);
+        setUtilizationMetrics(null);
+      }
+    };
+
+    fetchUtilizationMetrics();
+
+    return () => {
+      abortController.abort();
+    };
+  }, [agentApi, selectedClusterId]);
 
   // Compute available concerns and categories from inventory
   const availableConcerns = useMemo(() => {
@@ -636,6 +678,7 @@ export const ReportContainer: React.FC = () => {
             totalVMs={totalVMs}
             totalClusters={totalClusters}
             isConnected={isDataShared}
+            utilizationMetrics={utilizationMetrics}
           />
         </StackItem>
 
