@@ -54,6 +54,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   CredentialsForbiddenError,
   cancelForecastPair,
+  ForecastConflictError,
   getForecasterStatus,
   getPairCapabilities,
   getRuns,
@@ -101,6 +102,15 @@ function formatBytes(bytes: number): string {
   if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
   if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
   return `${bytes} B`;
+}
+
+function forecastPairToSelectedPair(pair: ForecastPairStatus): SelectedPair {
+  return {
+    id: pair.pairName,
+    name: pair.pairName,
+    sourceDatastore: pair.sourceDatastore,
+    targetDatastore: pair.targetDatastore,
+  };
 }
 
 function pairLabel(pair: SelectedPair): string {
@@ -1745,13 +1755,35 @@ const ResultsStep: React.FC<ResultsStepProps> = ({
                             title="No results yet"
                             isInline
                             actionLinks={
-                              <Button
-                                variant="link"
-                                isInline
-                                onClick={onRefresh}
-                              >
-                                Refresh results
-                              </Button>
+                              <>
+                                <Button
+                                  variant="link"
+                                  isInline
+                                  onClick={onRefresh}
+                                >
+                                  Refresh results
+                                </Button>
+                                {onRerun &&
+                                  benchmarkDone &&
+                                  forecastStatus?.state !== "running" && (
+                                    <Button
+                                      variant="link"
+                                      isInline
+                                      onClick={() =>
+                                        onRerun({
+                                          pairName: p.name,
+                                          sourceDatastore: p.sourceDatastore,
+                                          targetDatastore: p.targetDatastore,
+                                          state: "error",
+                                          completedRuns: 0,
+                                          totalRuns: 0,
+                                        })
+                                      }
+                                    >
+                                      Re-run benchmark
+                                    </Button>
+                                  )}
+                              </>
                             }
                           >
                             No estimation runs found for this pair.
@@ -2045,6 +2077,73 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     return () => stopPolling();
   }, [stopPolling]);
 
+  // On mount (fresh browser session, new tab, etc.), probe the backend to
+  // detect an already-running or recently-completed benchmark. sessionStorage
+  // is tab-scoped, so a new tab/session has no saved state. Without this
+  // probe the estimator would reset to the credentials step even if the
+  // forecaster is actively running on the server.
+  const hadSavedSession = useRef(!!_saved.activeStep);
+  useEffect(() => {
+    // Only act when no session was restored (i.e. truly fresh load)
+    if (hadSavedSession.current) return;
+
+    let cancelled = false;
+
+    const probe = async () => {
+      try {
+        const status = await getForecasterStatus(basePath);
+        if (cancelled) return;
+
+        if (status.state === "running") {
+          // Rebuild pairs from the backend status so the UI has something
+          // to display. Credentials aren't available but polling/display
+          // still works without them.
+          const backendPairs = (status.pairs ?? []).map(
+            forecastPairToSelectedPair,
+          );
+          if (backendPairs.length > 0) setPairs(backendPairs);
+
+          setForecastStatus(status);
+          setBenchmarkDone(false);
+          wasRunningRef.current = true;
+          setActiveStep("running");
+          return;
+        }
+
+        // Forecaster is idle — check if historical runs exist
+        const runs = await getRuns(basePath);
+        if (cancelled || runs.length === 0) return;
+
+        // Derive pair names from historical runs
+        const runsByPair = new Map<string, ForecastRun>();
+        for (const r of runs) {
+          if (!runsByPair.has(r.pairName)) runsByPair.set(r.pairName, r);
+        }
+        const backendPairs: SelectedPair[] = Array.from(
+          runsByPair.entries(),
+        ).map(([name, run]) => ({
+          id: name,
+          name,
+          sourceDatastore: run.sourceDatastore,
+          targetDatastore: run.targetDatastore,
+        }));
+        setPairs(backendPairs);
+        setAllRuns(runs);
+        setBenchmarkDone(true);
+        setActiveStep("results");
+        hasAutoLoadedResultsRef.current = false;
+      } catch (_) {
+        // Forecaster may not be reachable — stay on default step
+      }
+    };
+
+    probe();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [basePath]);
+
   // Persist wizard state on every relevant change (password excluded)
   useEffect(() => {
     // Only save when we have at least a url (avoid storing empty state)
@@ -2274,6 +2373,30 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     pollRef.current = setInterval(poll, 2000);
   }, [activeStep, benchmarkDone, basePath, pairs, stopPolling, loadResults]);
 
+  // Redirect to the running step showing an existing benchmark's live status.
+  // Used when a conflict is detected (another session already started a run).
+  const redirectToRunningBenchmark = useCallback(async (): Promise<boolean> => {
+    try {
+      const status = await getForecasterStatus(basePath);
+      setForecastStatus(status);
+
+      if (status.state === "running") {
+        const backendPairs = (status.pairs ?? []).map(
+          forecastPairToSelectedPair,
+        );
+        if (backendPairs.length > 0) setPairs(backendPairs);
+        setBenchmarkDone(false);
+        wasRunningRef.current = true;
+        setActiveStep("running");
+        return true;
+      }
+
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }, [basePath]);
+
   // ── Step 2 → Step 3: start benchmark ──
   const handleStartBenchmark = useCallback(async () => {
     const validPairs = pairs.filter(
@@ -2284,6 +2407,28 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       return;
     }
     setDsError(null);
+
+    // Pre-flight: check if another session already started a benchmark.
+    // Avoids the jarring flash of switching to "running" only to immediately
+    // get a 409 and redirect.
+    try {
+      const currentStatus = await getForecasterStatus(basePath);
+      if (currentStatus.state === "running") {
+        setForecastStatus(currentStatus);
+        const backendPairs = (currentStatus.pairs ?? []).map(
+          forecastPairToSelectedPair,
+        );
+        if (backendPairs.length > 0) setPairs(backendPairs);
+        setBenchmarkDone(false);
+        wasRunningRef.current = true;
+        setActiveStep("running");
+        return;
+      }
+    } catch (_) {
+      // If the status check fails, proceed with the start attempt anyway;
+      // the server will reject with 409 if needed.
+    }
+
     setForecastStatus(null);
     setBenchmarkDone(false);
     wasRunningRef.current = false;
@@ -2309,7 +2454,30 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       wasRunningRef.current = true;
     } catch (err) {
       pollRef.current = null; // clear sentinel on failure
-      // If startForecast itself fails, show an error status and stop
+
+      if (err instanceof ForecastConflictError) {
+        const redirected = await redirectToRunningBenchmark();
+        if (!redirected) {
+          setForecastStatus({
+            state: "ready",
+            pairs: [
+              {
+                pairName: "conflict-error",
+                sourceDatastore: "",
+                targetDatastore: "",
+                state: "error",
+                error:
+                  "A benchmark was started by another session but is no longer running. Please try again.",
+                completedRuns: 0,
+                totalRuns: 0,
+              },
+            ],
+          });
+          setBenchmarkDone(true);
+        }
+        return;
+      }
+
       setForecastStatus({
         state: "ready",
         pairs: [
@@ -2355,7 +2523,14 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     pollRef.current = null;
     poll();
     pollRef.current = setInterval(poll, 2000);
-  }, [basePath, credentials, pairs, stopPolling, loadResults]);
+  }, [
+    basePath,
+    credentials,
+    pairs,
+    stopPolling,
+    loadResults,
+    redirectToRunningBenchmark,
+  ]);
 
   const closeAddPairsModal = useCallback(() => {
     setIsAddPairsModalOpen(false);
@@ -2396,6 +2571,29 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       });
       wasRunningRef.current = true;
     } catch (err) {
+      if (err instanceof ForecastConflictError) {
+        const redirected = await redirectToRunningBenchmark();
+        if (!redirected) {
+          setForecastStatus({
+            state: "ready",
+            pairs: [
+              {
+                pairName: "conflict-error",
+                sourceDatastore: "",
+                targetDatastore: "",
+                state: "error",
+                error:
+                  "A benchmark was started by another session but is no longer running. Please try again.",
+                completedRuns: 0,
+                totalRuns: 0,
+              },
+            ],
+          });
+          setBenchmarkDone(true);
+        }
+        return;
+      }
+
       setForecastStatus({
         state: "ready",
         pairs: [
@@ -2456,6 +2654,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     closeAddPairsModal,
     stopPolling,
     loadResults,
+    redirectToRunningBenchmark,
   ]);
 
   // ── Cancel benchmark ──
@@ -2492,8 +2691,10 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       setBenchmarkDone(false);
       wasRunningRef.current = false;
 
-      const rerunPair = pairs.find((p) => p.name === pair.pairName) ?? {
-        id: pair.pairName,
+      // Always use the datastores from the ForecastPairStatus (the actual
+      // pair that ran), never from the mutable UI `pairs` selection state
+      // which may have been edited since the benchmark started.
+      const rerunPair = {
         name: pair.pairName,
         sourceDatastore: pair.sourceDatastore,
         targetDatastore: pair.targetDatastore,
@@ -2532,6 +2733,30 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
         });
         wasRunningRef.current = true;
       } catch (err) {
+        if (err instanceof ForecastConflictError) {
+          const redirected = await redirectToRunningBenchmark();
+          if (!redirected) {
+            setForecastStatus((prev) =>
+              prev
+                ? {
+                    ...prev,
+                    pairs: (prev.pairs ?? []).map((p) =>
+                      p.pairName === pair.pairName
+                        ? {
+                            ...p,
+                            state: "error" as const,
+                            error:
+                              "A benchmark was started by another session but is no longer running. Please try again.",
+                          }
+                        : p,
+                    ),
+                  }
+                : prev,
+            );
+          }
+          return;
+        }
+
         setForecastStatus((prev) =>
           prev
             ? {
@@ -2551,10 +2776,6 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
         return;
       }
 
-      const pairNames = pairs
-        .filter((p) => p.sourceDatastore && p.targetDatastore)
-        .map((p) => p.name);
-
       const poll = async () => {
         try {
           const status = await getForecasterStatus(basePath);
@@ -2565,6 +2786,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
           if (wasRunningRef.current && status.state === "ready") {
             stopPolling();
             setBenchmarkDone(true);
+            const pairNames = (status.pairs ?? []).map((p) => p.pairName);
             await loadResults(pairNames);
           }
         } catch (_) {
@@ -2575,7 +2797,13 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       poll();
       pollRef.current = setInterval(poll, 2000);
     },
-    [basePath, credentials, pairs, stopPolling, loadResults],
+    [
+      basePath,
+      credentials,
+      stopPolling,
+      loadResults,
+      redirectToRunningBenchmark,
+    ],
   );
 
   const canGoToStep2 =
