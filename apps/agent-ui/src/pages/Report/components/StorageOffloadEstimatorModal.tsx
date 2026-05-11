@@ -4,6 +4,7 @@ import {
   Card,
   CardBody,
   CardTitle,
+  Checkbox,
   Content,
   Dropdown,
   DropdownItem,
@@ -43,6 +44,7 @@ import {
   CheckCircleIcon,
   CopyIcon,
   EllipsisVIcon,
+  ExclamationTriangleIcon,
   ExternalLinkAltIcon,
   PlusCircleIcon,
   QuestionCircleIcon,
@@ -50,7 +52,7 @@ import {
   TrashIcon,
 } from "@patternfly/react-icons";
 import type React from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   CredentialsForbiddenError,
   cancelForecastPair,
@@ -98,12 +100,6 @@ function groupDatastoresByArray(
   return Array.from(map.values());
 }
 
-function formatBytes(bytes: number): string {
-  if (bytes >= 1024 ** 3) return `${(bytes / 1024 ** 3).toFixed(1)} GB`;
-  if (bytes >= 1024 ** 2) return `${(bytes / 1024 ** 2).toFixed(1)} MB`;
-  return `${bytes} B`;
-}
-
 function forecastPairToSelectedPair(pair: ForecastPairStatus): SelectedPair {
   return {
     id: pair.pairName,
@@ -117,6 +113,91 @@ function pairLabel(pair: SelectedPair): string {
   return `${pair.sourceDatastore} → ${pair.targetDatastore}`;
 }
 
+// ── Shared sub-components ─────────────────────────────────────────────────────
+
+interface PairProgressBarsProps {
+  prepProgress: number | undefined;
+  benchProgress: number;
+  isPreparing: boolean;
+  sourceDatastore: string;
+  targetDatastore: string;
+}
+
+const PairProgressBars: React.FC<PairProgressBarsProps> = ({
+  prepProgress,
+  benchProgress,
+  isPreparing,
+  sourceDatastore,
+  targetDatastore,
+}) => (
+  <>
+    <div style={{ marginTop: "12px" }}>
+      <Content component="p" style={{ fontWeight: 600, margin: "0 0 4px" }}>
+        Prepare
+      </Content>
+      <Content component="small" style={{ display: "block" }}>
+        Prepare environment for {sourceDatastore} → {targetDatastore}
+      </Content>
+      <Progress
+        value={isPreparing ? (prepProgress ?? 0) : 100}
+        size={ProgressSize.sm}
+        measureLocation="outside"
+        aria-label="Prep progress"
+      />
+    </div>
+    <div style={{ marginTop: "16px" }}>
+      <Content component="p" style={{ fontWeight: 600, margin: "0 0 4px" }}>
+        Running
+      </Content>
+      <Content component="small" style={{ display: "block" }}>
+        Benchmark progress for {sourceDatastore} → {targetDatastore}
+      </Content>
+      <Progress
+        value={isPreparing ? 0 : benchProgress}
+        size={ProgressSize.sm}
+        measureLocation="outside"
+        aria-label="Benchmark progress"
+      />
+    </div>
+  </>
+);
+
+interface TempResourcesAcknowledgementProps {
+  id: string;
+  isChecked: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+const TempResourcesAcknowledgement: React.FC<
+  TempResourcesAcknowledgementProps
+> = ({ id, isChecked, onChange }) => (
+  <Alert
+    variant="warning"
+    isInline
+    title="The forecaster creates temporary virtual machines and virtual disks in your vCenter environment"
+  >
+    <Content component="p" style={{ marginBottom: "12px" }}>
+      While all resources are cleaned up automatically after benchmarking,
+      vCenter administrators should be aware of this activity.
+    </Content>
+    <Checkbox
+      id={id}
+      label="I understand temporary resources will be created in my vCenter environment."
+      isChecked={isChecked}
+      onChange={(_e, checked) => onChange(checked)}
+    />
+    <div style={{ marginTop: "8px" }}>
+      <a
+        href="https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.10/html-single/planning_your_migration_to_red_hat_openshift_virtualization/index#about-storage-copy-offload_vmware"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Learn more <ExternalLinkAltIcon />
+      </a>
+    </div>
+  </Alert>
+);
+
 // ── Sub-components ────────────────────────────────────────────────────────────
 
 interface CredentialsStepProps {
@@ -125,6 +206,8 @@ interface CredentialsStepProps {
   error: string | null;
   missingPrivileges: string[];
   isLoading: boolean;
+  acknowledged: boolean;
+  onAcknowledgedChange: (checked: boolean) => void;
 }
 
 const CredentialsStep: React.FC<CredentialsStepProps> = ({
@@ -133,6 +216,8 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
   error,
   missingPrivileges,
   isLoading,
+  acknowledged,
+  onAcknowledgedChange,
 }) => (
   <Stack hasGutter>
     <StackItem>
@@ -170,6 +255,12 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
             placeholder="https://vcenter.example.com"
             isDisabled={isLoading}
           />
+          <Content
+            component="small"
+            style={{ color: "var(--pf-t--global--text--color--200)" }}
+          >
+            Example: https://vcenter.example.com
+          </Content>
         </FormGroup>
         <FormGroup label="Username" isRequired fieldId="vcenter-username">
           <TextInput
@@ -179,6 +270,12 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
             placeholder="administrator@vsphere.local"
             isDisabled={isLoading}
           />
+          <Content
+            component="small"
+            style={{ color: "var(--pf-t--global--text--color--200)" }}
+          >
+            Example: administrator@vsphere.local
+          </Content>
         </FormGroup>
         <FormGroup label="Password" isRequired fieldId="vcenter-password">
           <TextInput
@@ -190,6 +287,13 @@ const CredentialsStep: React.FC<CredentialsStepProps> = ({
           />
         </FormGroup>
       </Form>
+    </StackItem>
+    <StackItem>
+      <TempResourcesAcknowledgement
+        id="cred-acknowledge-temp-resources"
+        isChecked={acknowledged}
+        onChange={onAcknowledgedChange}
+      />
     </StackItem>
   </Stack>
 );
@@ -216,67 +320,34 @@ interface PairRowProps {
   idx: number;
   pair: SelectedPair;
   datastores: ForecasterDatastore[];
-  basePath: string;
   onChange: (idx: number, pair: SelectedPair) => void;
   onRemove: (idx: number) => void;
   canRemove: boolean;
+  pairCapabilities: string[] | null;
+  capsLoading: boolean;
 }
 
 const PairRow: React.FC<PairRowProps> = ({
   idx,
   pair,
   datastores,
-  basePath,
   onChange,
   onRemove,
   canRemove,
+  pairCapabilities,
+  capsLoading,
 }) => {
   const [isSrcOpen, setIsSrcOpen] = useState(false);
   const [isTgtOpen, setIsTgtOpen] = useState(false);
-  const [pairCapabilities, setPairCapabilities] = useState<string[] | null>(
-    null,
-  );
-  const [capsLoading, setCapsLoading] = useState(false);
 
   const srcDs = datastores.find((d) => d.name === pair.sourceDatastore) ?? null;
   const tgtDs = datastores.find((d) => d.name === pair.targetDatastore) ?? null;
 
-  useEffect(() => {
-    if (!pair.sourceDatastore || !pair.targetDatastore) {
-      setPairCapabilities(null);
-      return;
-    }
-    let cancelled = false;
-    setCapsLoading(true);
-    getPairCapabilities(basePath, {
-      pairs: [
-        {
-          name: pair.name,
-          sourceDatastore: pair.sourceDatastore,
-          targetDatastore: pair.targetDatastore,
-        },
-      ],
-    })
-      .then((result) => {
-        if (cancelled) return;
-        const cap = result.find(
-          (c) =>
-            c.sourceDatastore === pair.sourceDatastore &&
-            c.targetDatastore === pair.targetDatastore,
-        );
-        setPairCapabilities(cap?.capabilities ?? []);
-      })
-      .catch(() => {
-        if (!cancelled) setPairCapabilities(null);
-      })
-      .finally(() => {
-        if (!cancelled) setCapsLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [basePath, pair.name, pair.sourceDatastore, pair.targetDatastore]);
+  const hasNoCapabilities =
+    pairCapabilities !== null &&
+    pairCapabilities.length === 0 &&
+    !!pair.sourceDatastore &&
+    !!pair.targetDatastore;
 
   const dsOptions = datastores.map((ds) => (
     <SelectOption key={ds.name} value={ds.name}>
@@ -306,6 +377,7 @@ const PairRow: React.FC<PairRowProps> = ({
                     isExpanded={isSrcOpen}
                     onClick={() => setIsSrcOpen((o) => !o)}
                     style={{ width: "100%" }}
+                    status={hasNoCapabilities ? "danger" : undefined}
                   >
                     {pair.sourceDatastore || "Select source datastore"}
                   </MenuToggle>
@@ -355,6 +427,7 @@ const PairRow: React.FC<PairRowProps> = ({
                     isExpanded={isTgtOpen}
                     onClick={() => setIsTgtOpen((o) => !o)}
                     style={{ width: "100%" }}
+                    status={hasNoCapabilities ? "danger" : undefined}
                   >
                     {pair.targetDatastore || "Select target datastore"}
                   </MenuToggle>
@@ -374,6 +447,18 @@ const PairRow: React.FC<PairRowProps> = ({
                   Storage array: <strong>{datastoreArrayLabel(tgtDs)}</strong>
                 </Content>
               )}
+              {hasNoCapabilities && (
+                <Content
+                  component="small"
+                  style={{
+                    display: "block",
+                    marginTop: "4px",
+                    color: "var(--pf-t--global--color--status--danger--100)",
+                  }}
+                >
+                  Select different datastore pair with pair capabilities
+                </Content>
+              )}
             </GridItem>
           </Grid>
 
@@ -383,7 +468,7 @@ const PairRow: React.FC<PairRowProps> = ({
               style={{
                 marginTop: "10px",
                 padding: "8px 14px",
-                border: "1px solid var(--pf-t--global--color--brand--200)",
+                border: `1px solid ${hasNoCapabilities ? "var(--pf-t--global--color--status--danger--100)" : "var(--pf-t--global--color--brand--200)"}`,
                 borderRadius: "4px",
                 background: "var(--pf-t--global--background--color--100)",
               }}
@@ -405,6 +490,12 @@ const PairRow: React.FC<PairRowProps> = ({
                     component="small"
                     style={{ fontWeight: 600, display: "block" }}
                   >
+                    {hasNoCapabilities && (
+                      <ExclamationTriangleIcon
+                        color="var(--pf-t--global--color--status--danger--100)"
+                        style={{ marginRight: "6px" }}
+                      />
+                    )}
                     Pair capabilities
                   </Content>
                   <Flex
@@ -465,6 +556,10 @@ interface SelectPairsStepProps {
   isLoading: boolean;
   error: string | null;
   basePath: string;
+  onHasNoCaps?: (hasNoCaps: boolean) => void;
+  showVmWarning?: boolean;
+  vmAcknowledged?: boolean;
+  onVmAcknowledgedChange?: (checked: boolean) => void;
 }
 
 /** Returns true when two or more complete pairs share the same source-array → target-array route. */
@@ -495,8 +590,78 @@ const SelectPairsStep: React.FC<SelectPairsStepProps> = ({
   isLoading,
   error,
   basePath,
+  onHasNoCaps,
+  showVmWarning = false,
+  vmAcknowledged = false,
+  onVmAcknowledgedChange,
 }) => {
   const showDuplicateWarning = hasDuplicateArrayRoutes(pairs, datastores);
+
+  // Capabilities per pair: string[] (resolved), null (pending/error), or undefined (incomplete pair)
+  const [pairCapsMap, setPairCapsMap] = useState<
+    Record<string, string[] | null>
+  >({});
+  const [capsLoading, setCapsLoading] = useState(false);
+
+  const completePairs = useMemo(
+    () => pairs.filter((p) => p.sourceDatastore && p.targetDatastore),
+    [pairs],
+  );
+
+  useEffect(() => {
+    if (completePairs.length === 0) {
+      setPairCapsMap({});
+      setCapsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    setCapsLoading(true);
+
+    getPairCapabilities(basePath, {
+      pairs: completePairs.map((p) => ({
+        name: p.name,
+        sourceDatastore: p.sourceDatastore,
+        targetDatastore: p.targetDatastore,
+      })),
+    })
+      .then((results) => {
+        if (cancelled) return;
+        const next: Record<string, string[]> = {};
+        for (const p of completePairs) {
+          const cap = results.find(
+            (c) =>
+              c.sourceDatastore === p.sourceDatastore &&
+              c.targetDatastore === p.targetDatastore,
+          );
+          next[p.id] = cap?.capabilities ?? [];
+        }
+        setPairCapsMap(next);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        const next: Record<string, null> = {};
+        for (const p of completePairs) {
+          next[p.id] = null;
+        }
+        setPairCapsMap(next);
+      })
+      .finally(() => {
+        if (!cancelled) setCapsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [basePath, completePairs]);
+
+  useEffect(() => {
+    const anyNoCaps = completePairs.some((p) => {
+      const caps = pairCapsMap[p.id];
+      return caps !== null && caps !== undefined && caps.length === 0;
+    });
+    onHasNoCaps?.(anyNoCaps);
+  }, [pairCapsMap, completePairs, onHasNoCaps]);
 
   const addPair = () => {
     const id = `pair-${Date.now()}`;
@@ -544,11 +709,14 @@ const SelectPairsStep: React.FC<SelectPairsStepProps> = ({
           <Content component="p">
             <strong>{datastores.length}</strong> datastores discovered across{" "}
             <strong>{groups.length}</strong> storage array group(s).
+          </Content>
+          <Content component="p">
+            Select one or more source/target pairs to run a storage offload
+            estimate on.{" "}
             <a
               href="https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.10/html-single/planning_your_migration_to_red_hat_openshift_virtualization/index#about-storage-copy-offload_vmware"
               target="_blank"
               rel="noopener noreferrer"
-              style={{ marginLeft: "0.5rem" }}
             >
               Learn more <ExternalLinkAltIcon />
             </a>
@@ -629,10 +797,13 @@ const SelectPairsStep: React.FC<SelectPairsStepProps> = ({
             idx={idx}
             pair={pair}
             datastores={datastores}
-            basePath={basePath}
             onChange={updatePair}
             onRemove={removePair}
             canRemove={pairs.length > 1}
+            pairCapabilities={pairCapsMap[pair.id] ?? null}
+            capsLoading={
+              capsLoading && !!pair.sourceDatastore && !!pair.targetDatastore
+            }
           />
         ))}
         {showDuplicateWarning && (
@@ -655,6 +826,16 @@ const SelectPairsStep: React.FC<SelectPairsStepProps> = ({
           Add another pair
         </Button>
       </StackItem>
+
+      {showVmWarning && (
+        <StackItem>
+          <TempResourcesAcknowledgement
+            id="pairs-acknowledge-temp-resources"
+            isChecked={vmAcknowledged}
+            onChange={(checked) => onVmAcknowledgedChange?.(checked)}
+          />
+        </StackItem>
+      )}
     </Stack>
   );
 };
@@ -961,30 +1142,19 @@ const RunningStep: React.FC<RunningStepProps> = ({
                             </Content>
                           )}
 
-                          {/* Preparing state */}
-                          {isPreparing && prepProgress !== undefined && (
-                            <div style={{ marginBottom: "12px" }}>
-                              <Content
-                                component="small"
-                                style={{ display: "block" }}
-                              >
-                                Preparing disk:{" "}
-                                {formatBytes(pair.prepBytesUploaded || 0)} /{" "}
-                                {formatBytes(pair.prepBytesTotal || 0)}
-                              </Content>
-                              <Progress
-                                value={prepProgress}
-                                size={ProgressSize.sm}
-                                measureLocation="outside"
-                                aria-label="Prep progress"
-                              />
-                            </div>
+                          {/* Pending state — not yet started */}
+                          {pair.state === "pending" && (
+                            <Content
+                              component="small"
+                              style={{ display: "block", fontStyle: "italic" }}
+                            >
+                              Pending
+                            </Content>
                           )}
 
-                          {/* Running / pending: progress bar */}
-                          {(pair.state === "running" ||
-                            pair.state === "pending") && (
-                            <div>
+                          {/* Active states: preparing or running — show both progress bars */}
+                          {(isPreparing || pair.state === "running") && (
+                            <>
                               <Content
                                 component="small"
                                 style={{ display: "block" }}
@@ -992,24 +1162,14 @@ const RunningStep: React.FC<RunningStepProps> = ({
                                 Benchmark runs: {pair.completedRuns} /{" "}
                                 {pair.totalRuns}
                               </Content>
-                              <Content
-                                component="small"
-                                style={{
-                                  display: "block",
-                                  marginTop: "4px",
-                                  marginBottom: "4px",
-                                }}
-                              >
-                                Benchmark progress for {pair.sourceDatastore} →{" "}
-                                {pair.targetDatastore}
-                              </Content>
-                              <Progress
-                                value={benchProgress}
-                                size={ProgressSize.sm}
-                                measureLocation="outside"
-                                aria-label="Benchmark progress"
+                              <PairProgressBars
+                                prepProgress={prepProgress}
+                                benchProgress={benchProgress}
+                                isPreparing={isPreparing}
+                                sourceDatastore={pair.sourceDatastore}
+                                targetDatastore={pair.targetDatastore}
                               />
-                            </div>
+                            </>
                           )}
                         </CardBody>
 
@@ -1395,8 +1555,12 @@ const ResultsStep: React.FC<ResultsStepProps> = ({
                         >
                           <FlexItem>
                             <Content
-                              component="p"
-                              style={{ fontWeight: 600, margin: 0 }}
+                              component="h3"
+                              style={{
+                                fontWeight: 600,
+                                margin: 0,
+                                fontSize: "1.15rem",
+                              }}
                             >
                               {p.sourceDatastore} → {p.targetDatastore}
                             </Content>
@@ -1555,30 +1719,20 @@ const ResultsStep: React.FC<ResultsStepProps> = ({
                                 completion. You can run again when ready.
                               </Alert>
                             )}
-                            {isPreparing && prepProgress !== undefined && (
-                              <div style={{ marginBottom: "12px" }}>
-                                <Content
-                                  component="small"
-                                  style={{ display: "block" }}
-                                >
-                                  Preparing disk:{" "}
-                                  {formatBytes(
-                                    liveStatus.prepBytesUploaded || 0,
-                                  )}{" "}
-                                  /{" "}
-                                  {formatBytes(liveStatus.prepBytesTotal || 0)}
-                                </Content>
-                                <Progress
-                                  value={prepProgress}
-                                  size={ProgressSize.sm}
-                                  measureLocation="outside"
-                                  aria-label="Prep progress"
-                                />
-                              </div>
+                            {liveStatus.state === "pending" && (
+                              <Content
+                                component="small"
+                                style={{
+                                  display: "block",
+                                  fontStyle: "italic",
+                                }}
+                              >
+                                Pending
+                              </Content>
                             )}
-                            {(liveStatus.state === "running" ||
-                              liveStatus.state === "pending") && (
-                              <div>
+                            {(isPreparing ||
+                              liveStatus.state === "running") && (
+                              <>
                                 <Content
                                   component="small"
                                   style={{ display: "block" }}
@@ -1586,24 +1740,14 @@ const ResultsStep: React.FC<ResultsStepProps> = ({
                                   Benchmark runs: {liveStatus.completedRuns} /{" "}
                                   {liveStatus.totalRuns}
                                 </Content>
-                                <Content
-                                  component="small"
-                                  style={{
-                                    display: "block",
-                                    marginTop: "4px",
-                                    marginBottom: "4px",
-                                  }}
-                                >
-                                  Benchmark progress for {p.sourceDatastore} →{" "}
-                                  {p.targetDatastore}
-                                </Content>
-                                <Progress
-                                  value={benchProgress}
-                                  size={ProgressSize.sm}
-                                  measureLocation="outside"
-                                  aria-label="Benchmark progress"
+                                <PairProgressBars
+                                  prepProgress={prepProgress}
+                                  benchProgress={benchProgress}
+                                  isPreparing={isPreparing}
+                                  sourceDatastore={p.sourceDatastore}
+                                  targetDatastore={p.targetDatastore}
                                 />
-                              </div>
+                              </>
                             )}
                             {(liveStatus.state === "canceled" ||
                               liveStatus.state === "error") && (
@@ -1674,11 +1818,12 @@ const ResultsStep: React.FC<ResultsStepProps> = ({
                                     )}
                                   </Content>
                                   <Content
-                                    component="small"
+                                    component="p"
                                     style={{
                                       display: "block",
+                                      fontSize: "0.95rem",
                                       color:
-                                        "var(--pf-t--global--text--color--200)",
+                                        "var(--pf-t--global--text--color--100)",
                                       marginBottom: "16px",
                                     }}
                                   >
@@ -2045,6 +2190,17 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     null,
   );
 
+  // "I understand" checkbox state — credentials step
+  const [credAcknowledged, setCredAcknowledged] = useState(false);
+  // "I understand" checkbox state — select-pairs step
+  const [pairsVmAcknowledged, setPairsVmAcknowledged] = useState(false);
+  // "I understand" checkbox state — add-pairs modal
+  const [modalVmAcknowledged, setModalVmAcknowledged] = useState(false);
+  // Whether any complete pair has zero capabilities
+  const [pairsHaveNoCaps, setPairsHaveNoCaps] = useState(false);
+  // Whether any modal pair has zero capabilities
+  const [modalPairsHaveNoCaps, setModalPairsHaveNoCaps] = useState(false);
+
   // "Add more datastore pairs" modal
   const [isAddPairsModalOpen, setIsAddPairsModalOpen] = useState(false);
   const [modalPairs, setModalPairs] = useState<SelectedPair[]>([
@@ -2180,6 +2336,11 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     setBenchmarkDone(false);
     setStatsMap({});
     setAllRuns([]);
+    setCredAcknowledged(false);
+    setPairsVmAcknowledged(false);
+    setModalVmAcknowledged(false);
+    setPairsHaveNoCaps(false);
+    setModalPairsHaveNoCaps(false);
   }, [stopPolling]);
 
   // ── Step 1 → Step 2: validate credentials & fetch datastores ──
@@ -2542,6 +2703,8 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
         targetDatastore: "",
       },
     ]);
+    setModalVmAcknowledged(false);
+    setModalPairsHaveNoCaps(false);
   }, []);
 
   // ── Run benchmark from "Add more datastore pairs" modal ──
@@ -2807,11 +2970,15 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
   );
 
   const canGoToStep2 =
-    !!credentials.url && !!credentials.username && !!credentials.password;
+    !!credentials.url &&
+    !!credentials.username &&
+    !!credentials.password &&
+    credAcknowledged;
 
-  const canStartBenchmark = pairs.some(
-    (p) => p.sourceDatastore && p.targetDatastore,
-  );
+  const canStartBenchmark =
+    pairs.some((p) => p.sourceDatastore && p.targetDatastore) &&
+    !pairsHaveNoCaps &&
+    pairsVmAcknowledged;
 
   // ── Step indicator ──
   const steps: { id: WizardStepId; name: string }[] = [
@@ -2826,7 +2993,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     switch (activeStep) {
       case "credentials":
         return (
-          <Flex style={{ marginTop: "24px" }}>
+          <Flex style={{ marginTop: "24px" }} gap={{ default: "gapSm" }}>
             <FlexItem>
               <Button
                 variant="primary"
@@ -2835,6 +3002,20 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
                 isDisabled={!canGoToStep2 || credLoading}
               >
                 Next
+              </Button>
+            </FlexItem>
+            <FlexItem>
+              <Button
+                variant="link"
+                onClick={() => {
+                  setCredentials({ url: "", username: "", password: "" });
+                  setCredError(null);
+                  setCredMissingPrivileges([]);
+                  setCredAcknowledged(false);
+                }}
+                isDisabled={credLoading}
+              >
+                Clear credentials
               </Button>
             </FlexItem>
           </Flex>
@@ -2978,6 +3159,8 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
             error={credError}
             missingPrivileges={credMissingPrivileges}
             isLoading={credLoading}
+            acknowledged={credAcknowledged}
+            onAcknowledgedChange={setCredAcknowledged}
           />
         )}
         {activeStep === "select-pairs" && (
@@ -2989,6 +3172,10 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
             isLoading={dsLoading}
             error={dsError}
             basePath={basePath}
+            onHasNoCaps={setPairsHaveNoCaps}
+            showVmWarning
+            vmAcknowledged={pairsVmAcknowledged}
+            onVmAcknowledgedChange={setPairsVmAcknowledged}
           />
         )}
         {activeStep === "running" && (
@@ -3039,6 +3226,11 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
           labelId="add-pairs-modal-title"
         />
         <ModalBody id="add-pairs-modal-body">
+          <Content component="p" style={{ marginBottom: "16px" }}>
+            Select additional source and target datastore pairs to benchmark
+            alongside your existing results. Storage array hosting and estimated
+            capabilities update when both endpoints are chosen.
+          </Content>
           <SelectPairsStep
             datastores={datastores}
             groups={dsGroups}
@@ -3047,6 +3239,10 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
             isLoading={dsLoading}
             error={null}
             basePath={basePath}
+            onHasNoCaps={setModalPairsHaveNoCaps}
+            showVmWarning
+            vmAcknowledged={modalVmAcknowledged}
+            onVmAcknowledgedChange={setModalVmAcknowledged}
           />
         </ModalBody>
         <ModalFooter>
@@ -3054,10 +3250,12 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
             variant="primary"
             onClick={handleRunFromModal}
             isDisabled={
-              !modalPairs.some((p) => p.sourceDatastore && p.targetDatastore)
+              !modalPairs.some((p) => p.sourceDatastore && p.targetDatastore) ||
+              modalPairsHaveNoCaps ||
+              !modalVmAcknowledged
             }
           >
-            Run estimation
+            Add pairs & benchmark
           </Button>
           <Button variant="link" onClick={closeAddPairsModal}>
             Cancel
