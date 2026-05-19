@@ -2214,6 +2214,9 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Tracks whether we have seen state="running" so we can detect the "ready" transition
   const wasRunningRef = useRef(false);
+  // Pairs canceled by the user in this session — keeps their "canceled" state
+  // from being overwritten by the next poll returning "error" from the backend.
+  const canceledPairsRef = useRef<Set<string>>(new Set());
   // Prevents the auto-trigger from looping if getStats returns empty on restore
   const hasAutoLoadedResultsRef = useRef(false);
 
@@ -2227,6 +2230,21 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       clearInterval(pollRef.current);
       pollRef.current = null;
     }
+  }, []);
+
+  const applyPolledStatus = useCallback((status: ForecasterStatus) => {
+    if (canceledPairsRef.current.size === 0) {
+      setForecastStatus(status);
+      return;
+    }
+    setForecastStatus({
+      ...status,
+      pairs: status.pairs?.map((p) =>
+        canceledPairsRef.current.has(p.pairName)
+          ? { ...p, state: "canceled" as const, error: undefined }
+          : p,
+      ),
+    });
   }, []);
 
   useEffect(() => {
@@ -2451,11 +2469,8 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       try {
         const status = await getForecasterStatus(basePath);
         if (cancelled) return;
-        setForecastStatus(status);
-        if (status.state !== "running") {
-          setBenchmarkDone(true);
-          return;
-        }
+        applyPolledStatus(status);
+        if (status.state !== "running") return;
 
         // A benchmark is (still) running — possibly a new one started after
         // the previous one completed. Ensure the UI shows progress cards.
@@ -2474,7 +2489,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
           try {
             const s = await getForecasterStatus(basePath);
             if (cancelled) return;
-            setForecastStatus(s);
+            applyPolledStatus(s);
             if (s.state === "running") wasRunningRef.current = true;
             if (wasRunningRef.current && s.state === "ready") {
               stopPolling();
@@ -2498,7 +2513,14 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     return () => {
       cancelled = true;
     };
-  }, [activeStep, basePath, pairs, stopPolling, loadResults]);
+  }, [
+    activeStep,
+    basePath,
+    pairs,
+    stopPolling,
+    loadResults,
+    applyPolledStatus,
+  ]);
 
   // Resume polling when the session is restored with activeStep === "running"
   // (e.g. after a page refresh). handleStartBenchmark already sets up the poll
@@ -2519,7 +2541,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     const poll = async () => {
       try {
         const status = await getForecasterStatus(basePath);
-        setForecastStatus(status);
+        applyPolledStatus(status);
         if (status.state === "running") {
           wasRunningRef.current = true;
         }
@@ -2535,7 +2557,15 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
 
     poll();
     pollRef.current = setInterval(poll, 2000);
-  }, [activeStep, benchmarkDone, basePath, pairs, stopPolling, loadResults]);
+  }, [
+    activeStep,
+    benchmarkDone,
+    basePath,
+    pairs,
+    stopPolling,
+    loadResults,
+    applyPolledStatus,
+  ]);
 
   // Redirect to the running step showing an existing benchmark's live status.
   // Used when a conflict is detected (another session already started a run).
@@ -2596,6 +2626,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     setForecastStatus(null);
     setBenchmarkDone(false);
     wasRunningRef.current = false;
+    canceledPairsRef.current.clear();
 
     // Set a sentinel on pollRef BEFORE switching to "running" so the
     // "resume running" useEffect (designed for page-refresh recovery) does not
@@ -2665,7 +2696,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     const poll = async () => {
       try {
         const status = await getForecasterStatus(basePath);
-        setForecastStatus(status);
+        applyPolledStatus(status);
 
         if (status.state === "running") {
           wasRunningRef.current = true;
@@ -2694,6 +2725,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     stopPolling,
     loadResults,
     redirectToRunningBenchmark,
+    applyPolledStatus,
   ]);
 
   const closeAddPairsModal = useCallback(() => {
@@ -2796,7 +2828,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     const poll = async () => {
       try {
         const status = await getForecasterStatus(basePath);
-        setForecastStatus(status);
+        applyPolledStatus(status);
         if (status.state === "running") {
           wasRunningRef.current = true;
         }
@@ -2821,6 +2853,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     stopPolling,
     loadResults,
     redirectToRunningBenchmark,
+    applyPolledStatus,
   ]);
 
   // ── Cancel benchmark ──
@@ -2829,6 +2862,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       setCancelingPairName(pairName);
       try {
         await cancelForecastPair(basePath, pairName);
+        canceledPairsRef.current.add(pairName);
         setForecastStatus((prev) =>
           prev
             ? {
@@ -2855,6 +2889,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
     async (pair: ForecastPairStatus) => {
       stopPolling();
       setBenchmarkDone(false);
+      canceledPairsRef.current.delete(pair.pairName);
       wasRunningRef.current = false;
 
       // Always use the datastores from the ForecastPairStatus (the actual
@@ -2952,7 +2987,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       const poll = async () => {
         try {
           const status = await getForecasterStatus(basePath);
-          setForecastStatus(status);
+          applyPolledStatus(status);
           if (status.state === "running") {
             wasRunningRef.current = true;
           }
@@ -2976,6 +3011,7 @@ export const StorageOffloadTab: React.FC<StorageOffloadTabProps> = ({
       stopPolling,
       loadResults,
       redirectToRunningBenchmark,
+      applyPolledStatus,
     ],
   );
 
